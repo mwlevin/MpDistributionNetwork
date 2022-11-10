@@ -5,6 +5,9 @@
  */
 package mpdistributionnetwork;
 
+import ilog.concert.IloException;
+import java.io.IOException;
+
 /**
  *
  * @author micha
@@ -14,8 +17,10 @@ public class Main {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IloException, IOException {
         // TODO code application logic here
+        
+        Network test = new Network();
     }
     
 }
