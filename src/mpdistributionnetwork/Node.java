@@ -26,9 +26,9 @@ public class Node extends Location{
     public Node(String name, double lat, double lng, int num_zones, int capacity){
         super(name, lat, lng);
         
-
         x = new int[Params.S][num_zones];
         cost = new double[num_zones];
+        this.capacity = capacity;
     }
  
     
@@ -41,8 +41,8 @@ public class Node extends Location{
         cost[z.getIdx()] = c;
     }
     
-    public double getCost(ZIP3 z){
-        return cost[z.getIdx()];
+    public double getCost(int d){
+        return cost[d];
     }
     
     
@@ -58,10 +58,37 @@ public class Node extends Location{
         // solve MP problem
         
         IloCplex cplex = new IloCplex();
+        cplex.setOut(Params.out);
+        
+        IloLinearNumExpr obj = cplex.linearNumExpr();
         
         for(Link ij : outgoing){
-            ij.createVariables(cplex);
+            for(int s = 0; s < x.length; s++){
+                for(int d = 0; d < x[s].length; d++){
+                    if(x[s][d] > 0){
+                        double w = x[s][d];
+                        
+                        if(ij.getDest() instanceof Node){
+                            w -= ((Node)ij.getDest()).x[s][d];
+                        }
+                        
+                        double obj_weight = w + Params.beta * (getCost(d) - ij.getDest().getCost(d));
+                        
+                        if(obj_weight > 0){
+                            ij.mpvar_y[s][d] = cplex.intVar(0, x[s][d]);
+                            obj.addTerm(obj_weight, ij.mpvar_y[s][d]);
+                        }
+                        else{
+                            ij.mpvar_y[s][d] = null;
+                        }
+                    }
+                    else{
+                        ij.mpvar_y[s][d] = null;
+                    }
+                }
+            }
         }
+        cplex.addMaximize(obj);
         
         // inventory
         for(int s = 0; s < x.length; s++){
@@ -96,7 +123,6 @@ public class Node extends Location{
         
         
         
-        
         cplex.solve();
         
         for(Link ij : outgoing){
@@ -113,11 +139,31 @@ public class Node extends Location{
                 
                 for(Link inc : incoming){
                     x[s][d] += inc.y[inc.tt-1][s][d];
+                    
+                    /*
+                    if(inc.y[inc.tt-1][s][d] > 0){
+                        System.out.println("Received "+d+" at "+getName()+" "+getClass().getName());
+                    }
+*/
                 }
                 
                 for(Link out : outgoing){
+                    
                     x[s][d] -= out.y[0][s][d];
+                    
+                    /*
+                    if(out.y[0][s][d] > 0){
+                        System.out.println("Shipped "+d+" from "+getName()+" "+getClass().getName());
+                    }
+*/
                 }
+                
+                if(x[s][d] < 0){
+                    throw new RuntimeException("x[s][d]<0 "+x[s][d]);
+                }
+                
+                Network.total_packages += x[s][d];
+                
             }
         }
         

@@ -43,7 +43,7 @@ public abstract class Location implements Comparable<Location> {
     public abstract void step() throws IloException ;
     public abstract void update();
     public abstract void setCost(ZIP3 d, double cost);
-    public abstract double getCost(ZIP3 d);
+    public abstract double getCost(int d);
     public abstract boolean isValidDest(int d);
     
     public String getName(){

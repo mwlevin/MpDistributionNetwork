@@ -27,8 +27,8 @@ public class ZIP3 extends Location {
         return idx;
     }
     
-    public double getCost(ZIP3 d){
-        if(d == this){
+    public double getCost(int d){
+        if(d == idx){
             return 0;
         }
         else{

@@ -16,6 +16,8 @@ public class SC extends Node {
         super(name, lat, lng, num_zones, capacity);
     }
     
-    
+    public boolean isValidDest(int d){
+        return true;
+    }
     
 }

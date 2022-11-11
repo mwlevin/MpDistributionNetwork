@@ -20,27 +20,29 @@ public class OriginArc {
     protected int gamma[][]; // 1st index is product, 2nd index is dest
     protected IloIntVar mpvar_gamma[][];
     
+    
     public OriginArc(int num_zones, FC fc){
         gamma = new int[Params.P][num_zones];
         mpvar_gamma = new IloIntVar[Params.P][num_zones];
         this.fc = fc;
         fc.setOriginArc(this);
+
     }
     
     public void setGamma(IloCplex cplex) throws IloException{
         for(int p = 0; p < gamma.length; p++){
-            for(int d = 0; d < gamma.length; d++){
-                gamma[p][d] = (int)Math.round(cplex.getValue(mpvar_gamma[p][d]));
+            for(int d = 0; d < gamma[p].length; d++){
+                if(mpvar_gamma[p][d] != null){
+                    gamma[p][d] = (int)Math.round(cplex.getValue(mpvar_gamma[p][d]));
+                }
+                else{
+                    gamma[p][d] = 0;
+                }
             }
         }
     }
     
-    public void createVariables(IloCplex cplex) throws IloException {
-        for(int p = 0; p < gamma.length; p++){
-            for(int d = 0; d < gamma.length; d++){
-                mpvar_gamma[p][d] = cplex.intVar(0, 1000);
-                gamma[p][d] = 0;
-            }
-        }
-    }
+
+    
+    
 }

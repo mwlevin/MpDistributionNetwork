@@ -5,6 +5,10 @@
  */
 package mpdistributionnetwork;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Random;
 
 /**
@@ -12,25 +16,38 @@ import java.util.Random;
  * @author micha
  */
 public class Params {
-    public static final int P = 10;
+    public static final int P = 20;
     public static final int[] SIZE = new int[]{}; // size cutoff
     public static final int S = SIZE.length+1;
     
-    public static final double SPEED = 60;
     
-    public static final int T = 365*24;
+    public static final int DAY = 24;
+    public static final int T = 365*DAY;
+    
+    public static final double SPEED = 60.0 * 24.0/DAY;
+    
+    public static final double beta = 0.05;
+    
+    public static final int FC_CAPACITY = (int)Math.round(100 * 24.0/DAY);
+    public static final int SC_CAPACITY = (int)Math.round(1000 * 24.0/DAY);
+    public static final int DS_CAPACITY = (int)Math.round(1000 * 24.0/DAY);
+    
+    public static final double epsilon_inv = 5; // extra inventory deliveries
+    public static final double epsilon_cap = 5; // extra inventory deliveries
     
     
+    public static final boolean PRINT_CPLEX = false;
     
+    public static final int NUM_ZONES = 500;
     
-    
+    public static PrintStream out;
     public static Random rand = new Random(1234);
     
     
     
     public static int[] SIZES = new int[P];
     
-    public static void init(){
+    public static void init() throws IOException{
         int s = 0;
         for(int p = 0; p < P; p++){
             if(s < SIZE.length && p >= SIZE[s]){
@@ -38,6 +55,13 @@ public class Params {
             }
             
             SIZES[p] = s;
+        }
+        
+        if(PRINT_CPLEX){
+            out = System.out;
+        }
+        else{
+            out = new PrintStream(new FileOutputStream(new File("log.txt"), true));
         }
     }
     

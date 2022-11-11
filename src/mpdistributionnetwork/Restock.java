@@ -9,12 +9,10 @@ package mpdistributionnetwork;
  *
  * @author micha
  */
-public class Restock implements RandomVar {
-    public int nextDraw(){
-        return 0;
+public class Restock extends Poisson {
+
+    public Restock(double lambda){
+        super(lambda);
     }
-    
-    public double getAvg(){
-        return 0;
-    }
+
 }

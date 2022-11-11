@@ -56,7 +56,7 @@ public class Network {
             
             count++;
             
-            if(count == 500){
+            if(count == Params.NUM_ZONES){
                 break;
             }
         }
@@ -66,6 +66,8 @@ public class Network {
         for(ZIP3 z : zips){
             dests[z.getIdx()] = z;
         }
+        
+        
         
         
         
@@ -84,8 +86,8 @@ public class Network {
                 name = name.substring(0, name.indexOf('/'));
             }
             name = name.replaceAll("#", "");
-            
-            fc.add(new FC(name, lat, lng, dests.length, 0, null));
+      
+            fc.add(new FC(name, lat, lng, dests.length, Params.FC_CAPACITY));
         }
         filein.close();
         
@@ -95,6 +97,83 @@ public class Network {
             fcs[f.getIdx()] = f;
             all_nodes.add(f);
         }
+        
+        double total_capacity = 0;
+        
+        for(FC f : fcs){
+            total_capacity += f.getCapacity();
+        }
+        
+        total_capacity /= (1+Params.epsilon_cap);
+        
+        double[] total = new double[Params.P];
+        
+        double total_prob = 0;
+        for(int p = 0; p < total.length; p++){
+            total[p] = Params.rand.nextDouble();
+            total_prob += total[p];
+        }
+
+
+        for(int p = 0; p < total.length; p++){
+            total[p] = total_capacity * total[p] / total_prob;
+            
+        }
+        
+        
+        
+        double[][] prob = new double[fcs.length][Params.P];
+        
+        double[] total_p = new double[Params.P];
+        
+        for(int f = 0; f < fcs.length; f++){
+            for(int p = 0; p < Params.P; p++){
+                prob[f][p] = Params.rand.nextDouble();
+                total_p[p] += prob[f][p];
+            }
+        }
+        
+        double total_inv = 0;
+        
+        for(int f = 0; f < fcs.length; f++){
+            Restock[] r = new Restock[Params.P];
+            
+            for(int p = 0; p < Params.P; p++){
+                r[p] = new Restock(prob[f][p] / total_p[p] * (1+Params.epsilon_inv)*total[p]);
+                
+                total_inv += r[p].getAvg();
+            }
+            
+            fcs[f].setRestock(r);
+            
+        }
+        
+        prob = new double[Params.P][dests.length];
+        total_p = new double[Params.P];
+        
+        for(int d = 0; d < dests.length; d++){
+            for(int p = 0; p < Params.P; p++){
+                prob[p][d] = Params.rand.nextDouble();
+                total_p[p] += prob[p][d];
+            }
+        }
+        
+        Demand[][] dem = new Demand[Params.P][dests.length];
+        
+        double total_lambda = 0;
+        for(int d = 0; d < dests.length; d++){
+            for(int p = 0; p < Params.P; p++){
+                dem[p][d] = new Demand(prob[p][d] / total_p[p] * total[p]);
+                total_lambda += dem[p][d].getAvg();
+            }
+        }
+        
+        System.out.println("Total demand: "+total_lambda+" Total supply: "+total_inv);
+        
+        
+        
+        
+        
         
         filein = new Scanner(new File("data/SC.txt"));
         filein.nextLine();
@@ -109,7 +188,7 @@ public class Network {
                 name = name.substring(0, name.indexOf('/'));
             }
             name = name.replaceAll("#", "");
-            SC sc = new SC(name, lat, lng, dests.length, 0);
+            SC sc = new SC(name, lat, lng, dests.length, Params.SC_CAPACITY);
             all_nodes.add(sc);
             scs.add(sc);
         }
@@ -130,7 +209,7 @@ public class Network {
             }
             name = name.replaceAll("#", "");
             
-            DS ds = new DS(name, lat, lng, dests.length, 0);
+            DS ds = new DS(name, lat, lng, dests.length, Params.DS_CAPACITY);
             all_nodes.add(ds);
             dss.add(ds);
         }
@@ -190,42 +269,59 @@ public class Network {
             }
         }
         
-        
-        dem = new Demand[Params.P][dests.length];
-        
-        
+
         
         origin = new Origin(fcs, dem);
         calcCosts();
     }
     
     public static int t;
+    public static int total_delivered, total_packages, total_orders, new_orders, total_inventory, new_inventory;
     
     public void simulate() throws IloException {
+        
+        System.out.println("Time\tOrders\tDemand\tInventory\tRestock\tPackages\tDelivered");
+        
         for(t = 0; t < Params.T; t++){
+            
             step();
             update();
+            System.out.println(t+"\t"+total_orders+"\t"+new_orders+"\t"+total_inventory+"\t"+new_inventory+"\t"+total_packages+"\t"+total_delivered);
+            
+            total_orders = 0;
+            total_packages = 0;
+            total_delivered = 0;
+            total_inventory = 0;
+            new_inventory = 0;
+            new_orders = 0;
         }
     }
     
     
     
     public void step() throws IloException {
+        
+        origin.step();
+        
+        
         for(Location n : all_nodes){
             n.step();
         }
         
         
-        origin.step();
+        
     }
     
     public void update(){
+        
+        origin.update();
+        
         for(Location n : all_nodes){
             n.update();
         }
         
         
-        origin.update();
+        
     }
     
     

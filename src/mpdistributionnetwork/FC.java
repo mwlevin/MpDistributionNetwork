@@ -22,11 +22,15 @@ public class FC extends Node {
     
     
     
-    public FC(String name, double lat, double lng, int num_zones, int capacity, Restock[] restock){
+    public FC(String name, double lat, double lng, int num_zones, int capacity){
         super(name, lat, lng, num_zones, capacity);
         
         idx = next_idx++;
         v = new int[Params.P];
+        
+    }
+    
+    public void setRestock(Restock[] restock){
         this.restock = restock;
     }
     
@@ -48,11 +52,22 @@ public class FC extends Node {
             for(int d = 0; d < arc.gamma[p].length; d++){
                 x[Params.SIZES[p]][d] += arc.gamma[p][d];
                 v[p] -= arc.gamma[p][d];
+                
+                /*
+                if(arc.gamma[p][d] > 0){
+                    System.out.println("Fulfilled "+d+" at "+idx);
+                }
+                */
             }
         }
         
         for(int p = 0; p < v.length; p++){
-            v[p] += restock[p].nextDraw();
+            
+            double res = restock[p].nextDraw();
+            v[p] += res;
+            Network.new_inventory += res;
+            
+            Network.total_inventory += v[p];
         }
         
         super.update();
