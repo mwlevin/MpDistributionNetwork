@@ -19,7 +19,7 @@ public class Main {
      */
     public static void main(String[] args) throws IloException, IOException {
         // TODO code application logic here
-        
+
         Params.init();
         
         Network test = new Network();

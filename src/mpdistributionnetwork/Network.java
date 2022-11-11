@@ -168,6 +168,7 @@ public class Network {
             }
         }
         
+
         System.out.println("Total demand: "+total_lambda+" Total supply: "+total_inv);
         
         
