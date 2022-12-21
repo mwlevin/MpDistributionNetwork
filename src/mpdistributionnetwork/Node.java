@@ -54,6 +54,59 @@ public class Node extends Location{
     }
     
     public void step() throws IloException {
+        if(Network.useMP){
+            stepMP();
+        }
+        else {
+            stepSimple();
+        }
+    }
+    
+    public void stepSimple(){
+        
+        int remainingCap = capacity;
+        
+        // set to 0 to start with
+        for(Link ij : outgoing){
+            for(int s = 0; s < x.length; s++){
+                for(int d = 0; d < x[s].length; d++){
+                    ij.y[0][s][d] = 0;
+                }
+            }
+        }
+        
+        outer: for(int s = 0; s < x.length; s++){
+            for(int d = 0; d < x[s].length; d++){
+                if(x[s][d] > 0 && remainingCap > 0){
+                    // find best outgoing link
+                    Link best = null;
+                    double cost = Integer.MAX_VALUE;
+                    double temp = 0;
+                    
+                    for(Link ij : outgoing){
+                        if(ij.getDest().isValidDest(d) && (temp = ij.getDest().getCost(d)) < cost){
+                            best = ij;
+                            cost = temp;
+                        }
+                    }
+                    
+                    int fulfilled = Math.min(x[s][d], remainingCap);
+                    
+                    best.y[0][s][d] += fulfilled;
+                    remainingCap -= fulfilled;
+                    
+                    if(remainingCap == 0){
+                        break outer;
+                    }
+                }
+
+                
+            }
+        }
+    }
+    
+    
+    public void stepMP() throws IloException {
         
         // solve MP problem
         
@@ -74,7 +127,7 @@ public class Node extends Location{
                         
                         double obj_weight = w + Params.beta * (getCost(d) - ij.getDest().getCost(d));
                         
-                        if(obj_weight > 0){
+                        if(ij.getDest().isValidDest(d) && obj_weight > 0){
                             ij.mpvar_y[s][d] = cplex.intVar(0, x[s][d]);
                             obj.addTerm(obj_weight, ij.mpvar_y[s][d]);
                         }
@@ -144,7 +197,7 @@ public class Node extends Location{
                     if(inc.y[inc.tt-1][s][d] > 0){
                         System.out.println("Received "+d+" at "+getName()+" "+getClass().getName());
                     }
-*/
+                    */
                 }
                 
                 for(Link out : outgoing){
@@ -155,7 +208,13 @@ public class Node extends Location{
                     if(out.y[0][s][d] > 0){
                         System.out.println("Shipped "+d+" from "+getName()+" "+getClass().getName());
                     }
-*/
+                    */
+
+                    if(out.getDest() instanceof ZIP3 && out.y[0][s][d] > 0){
+                        //System.out.println("Delivered "+d);
+                        Network.total_delivered += out.y[0][s][d];
+                    }
+
                 }
                 
                 if(x[s][d] < 0){

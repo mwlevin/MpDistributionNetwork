@@ -30,8 +30,8 @@ public class Network {
     private Restock[][] restock;
     
     
-    public Network() throws IOException {
-        
+    public Network(boolean mp) throws IOException {
+        useMP = mp;
         
         all_nodes = new ArrayList<>();
         
@@ -278,6 +278,7 @@ public class Network {
     
     public static int t;
     public static int total_delivered, total_packages, total_orders, new_orders, total_inventory, new_inventory;
+    public static boolean useMP;
     
     public void simulate() throws IloException {
         

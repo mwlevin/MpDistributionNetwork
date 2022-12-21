@@ -22,7 +22,7 @@ public class Main {
 
         Params.init();
         
-        Network test = new Network();
+        Network test = new Network(false);
         test.simulate();
     }
     

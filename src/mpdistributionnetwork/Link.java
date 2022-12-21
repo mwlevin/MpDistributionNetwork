@@ -50,27 +50,29 @@ public class Link {
             for(int d = 0; d < y[0][s].length; d++){
                 if(mpvar_y[s][d] != null){
                     y[0][s][d] = (int)Math.round(cplex.getValue(mpvar_y[s][d]));
-                    
-                    
-                    if(dest instanceof ZIP3 && y[0][s][d] > 0){
-                        //System.out.println("Delivered "+d);
-                        Network.total_delivered++;
-                    }
-                    
                 }
                 else{
                     y[0][s][d] = 0;
                 }
             }
         }
+        
+        
     }
     
 
     
     public void update(){
+        
+        
+        
+        
         for(int tau = y.length-1; tau > 0; tau--){
             y[tau] = y[tau-1];
         }
+        
+        
+
     }
     
     public Location getStart(){

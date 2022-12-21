@@ -63,7 +63,7 @@ public class FC extends Node {
         
         for(int p = 0; p < v.length; p++){
             
-            double res = restock[p].nextDraw();
+            double res = Math.min(Params.inventory_max - v[p], restock[p].nextDraw());
             v[p] += res;
             Network.new_inventory += res;
             

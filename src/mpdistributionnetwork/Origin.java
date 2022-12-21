@@ -39,8 +39,83 @@ public class Origin {
     }
     
     
-    
     public void step() throws IloException {
+        if(Network.useMP){
+            stepMP();
+        }
+        else{
+            stepSimple();
+        }
+    }
+    
+    public void stepSimple() throws IloException {
+        
+        
+        for(int p = 0; p < chi.length; p++){
+            for(int d = 0; d < chi[p].length; d++){
+                    //System.out.println("***** "+p+" "+d);
+                for(int i = 0; i < arcs.length; i++){
+                    arcs[i].gamma[p][d] = 0;
+                }
+            }
+        }
+        
+        // find nearest FC with product in stock and fulfill
+        for(int p = 0; p < chi.length; p++){
+            for(int d = 0; d < chi[p].length; d++){
+                
+                
+                int orders = chi[p][d];
+                while(orders > 0){
+                    
+                    OriginArc best = null;
+                    double cost = Integer.MAX_VALUE;
+                    
+                    double temp = 0;
+                    int fulfilled = 0;
+                    
+                    
+                    for(OriginArc a : arcs){
+                        
+ 
+                        int product_sent = 0;
+                        int total_sent = 0;
+                        
+                        for(int d2 = 0; d2 < chi[p].length; d2++){
+                            product_sent += a.gamma[p][d2];
+                        }
+                        
+                        for(int p2 = 0; p2 < chi.length; p2++){
+                            for(int d2 = 0; d2 < chi[p2].length; d2++){
+                                total_sent += a.gamma[p2][d2];
+                            }
+                        }
+                        
+                        int avail = Math.min(a.fc.v[p] - product_sent, a.fc.getCapacity() - total_sent);
+                        
+                        
+                        if(avail > 0 && (temp = a.fc.getCost(d)) < cost){
+                            cost = temp;
+                            best = a;
+                            fulfilled = Math.min(avail, orders);
+                        }
+                    }
+                    
+                    if(best == null){
+                        break;
+                    }
+                    
+
+                    orders -= fulfilled;
+                    best.gamma[p][d] += fulfilled;
+                    
+                }
+
+            }
+        }
+    }
+    
+    public void stepMP() throws IloException {
         IloCplex cplex = new IloCplex();
         cplex.setOut(Params.out);
         
@@ -52,8 +127,8 @@ public class Origin {
                     if(chi[p][d] > 0){
                         int omega = chi[p][d] - arcs[i].fc.x[Params.SIZES[p]][d];
 
-                        //double obj_weight = omega - Params.beta * arcs[i].fc.getCost(d);
-                        double obj_weight = omega;
+                        double obj_weight = omega - Params.beta * arcs[i].fc.getCost(d);
+                        //double obj_weight = omega;
                         
 
 
@@ -112,7 +187,7 @@ public class Origin {
                     }
                 }  
             }
-            //cplex.addLe(lhs, arcs[i].fc.getCapacity());
+            cplex.addLe(lhs, arcs[i].fc.getCapacity());
         }
 
         
@@ -153,12 +228,15 @@ public class Origin {
         
         for(int p = 0; p < chi.length; p++){
             for(int d = 0; d < chi[p].length; d++){
+
                 double orders = dem[p][d].nextDraw();
                 chi[p][d] += orders;
                 Network.new_orders += orders;
                 
+                int total = 0;
+                
                 for(int i = 0; i < arcs.length; i++){
-
+                    total += arcs[i].gamma[p][d];
                     chi[p][d] -= arcs[i].gamma[p][d];
                 }
                 

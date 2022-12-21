@@ -17,7 +17,7 @@ import java.util.Random;
  */
 public class Params {
     public static final int P = 20;
-    public static final int[] SIZE = new int[]{}; // size cutoff
+    public static final int[] SIZE = new int[]{P/2}; // size cutoff
     public static final int S = SIZE.length+1;
     
     
@@ -32,8 +32,8 @@ public class Params {
     public static final int SC_CAPACITY = (int)Math.round(1000 * 24.0/DAY);
     public static final int DS_CAPACITY = (int)Math.round(1000 * 24.0/DAY);
     
-    public static final double epsilon_inv = 5; // extra inventory deliveries
-    public static final double epsilon_cap = 5; // extra inventory deliveries
+    public static final double epsilon_inv = 0.1; // extra inventory deliveries
+    public static final double epsilon_cap = 0.1; // extra inventory deliveries
     
     
     public static final boolean PRINT_CPLEX = false;
@@ -42,6 +42,8 @@ public class Params {
     
     public static PrintStream out;
     public static Random rand = new Random(1234);
+    
+    public static final int inventory_max = 30;
     
     
     
