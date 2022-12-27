@@ -22,7 +22,7 @@ public class Params {
     
     
     public static final int DAY = 24;
-    public static final int T = 365*DAY;
+    public static final int T = 30*DAY;
     
     public static final double SPEED = 60.0 * 24.0/DAY;
     
@@ -38,7 +38,7 @@ public class Params {
     
     public static final boolean PRINT_CPLEX = false;
     
-    public static final int NUM_ZONES = 500;
+    public static final int NUM_ZONES = 1000;
     
     public static PrintStream out;
     public static Random rand = new Random(1234);

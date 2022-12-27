@@ -8,6 +8,7 @@ package mpdistributionnetwork;
 import ilog.concert.IloException;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,10 +20,14 @@ import java.util.Scanner;
  * @author micha
  */
 public class Network {
+    
+    public static int zip3_next_idx = 0;
+    public static int fc_next_idx = 0;
+    
     private FC[] fcs;
     private ZIP3[] dests;
     
-    private List<Location> all_nodes;
+    private List<Node> all_nodes;
     
     private Origin origin;
     
@@ -31,6 +36,10 @@ public class Network {
     
     
     public Network(boolean mp) throws IOException {
+        
+        zip3_next_idx = 0;
+        fc_next_idx = 0;
+        
         useMP = mp;
         
         all_nodes = new ArrayList<>();
@@ -90,6 +99,8 @@ public class Network {
             fc.add(new FC(name, lat, lng, dests.length, Params.FC_CAPACITY));
         }
         filein.close();
+        
+        
         
         fcs = new FC[fc.size()];
         
@@ -153,7 +164,7 @@ public class Network {
         
         for(int d = 0; d < dests.length; d++){
             for(int p = 0; p < Params.P; p++){
-                prob[p][d] = Params.rand.nextDouble();
+                prob[p][d] = Params.rand.nextDouble() * dests[d].getPopulation();
                 total_p[p] += prob[p][d];
             }
         }
@@ -217,8 +228,9 @@ public class Network {
         filein.close();
         
         
-        
-        
+        System.out.println("FCs: "+fc.size());
+        System.out.println("SCs: "+scs.size());
+        System.out.println("DSs: "+dss.size());
         
         
         
@@ -277,18 +289,31 @@ public class Network {
     }
     
     public static int t;
-    public static int total_delivered, total_packages, total_orders, new_orders, total_inventory, new_inventory;
+    public static int total_delivered, total_packages, total_orders, new_orders, total_inventory, new_inventory, new_packages;
     public static boolean useMP;
     
-    public void simulate() throws IloException {
+    private RunningAvg originTime;
+    private RunningAvg nodeTime;
+    private int sim_delivered;
+    private int sim_packages;
+    private int sim_orders;
+    
+    public void simulate(PrintStream out) throws IloException {
         
-        System.out.println("Time\tOrders\tDemand\tInventory\tRestock\tPackages\tDelivered");
+        originTime = new RunningAvg();
+        nodeTime = new RunningAvg();
+        
+        out.println("Time\tOrders\tDemand\tInventory\tRestock\tTotal packages\tNew packages\tDelivered");
         
         for(t = 0; t < Params.T; t++){
             
             step();
             update();
-            System.out.println(t+"\t"+total_orders+"\t"+new_orders+"\t"+total_inventory+"\t"+new_inventory+"\t"+total_packages+"\t"+total_delivered);
+            out.println(t+"\t"+total_orders+"\t"+new_orders+"\t"+total_inventory+"\t"+new_inventory+"\t"+total_packages+"\t"+new_packages+"\t"+total_delivered);
+            
+            sim_orders += new_orders;
+            sim_delivered += total_delivered;
+            sim_packages += new_packages;
             
             total_orders = 0;
             total_packages = 0;
@@ -296,18 +321,39 @@ public class Network {
             total_inventory = 0;
             new_inventory = 0;
             new_orders = 0;
+            new_packages = 0;
         }
+        
+        out.println("Origin CPU time\t"+originTime.getAverage());
+        out.println("Node CPU time\t"+nodeTime.getAverage());
+        out.println("Total packages\t"+sim_packages);
+        out.println("Total orders\t"+sim_orders);
+        out.println("Total delivered\t"+sim_delivered);
+    }
+    
+    public List<Node> getNodes(){
+        return all_nodes;
+    }
+    
+    public ZIP3[] getDests(){
+        return dests;
     }
     
     
     
     public void step() throws IloException {
         
+        long time = System.nanoTime();
         origin.step();
+        
+        originTime.add( (System.nanoTime() - time)/1.0e9);
         
         
         for(Location n : all_nodes){
+            time = System.nanoTime();
             n.step();
+            
+            nodeTime.add( (System.nanoTime() - time)/1.0e9);
         }
         
         

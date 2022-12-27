@@ -11,7 +11,7 @@ package mpdistributionnetwork;
  */
 public class ZIP3 extends Location {
     private int idx;
-    private static int next_idx = 0;
+    
     
     private int pop;
     private int zip;
@@ -20,11 +20,15 @@ public class ZIP3 extends Location {
         super(""+zip, lat, lng);
         this.pop = pop;
         
-        idx = next_idx++;
+        idx = Network.zip3_next_idx++;
     }
     
     public int getIdx(){
         return idx;
+    }
+    
+    public int getPopulation(){
+        return pop;
     }
     
     public double getCost(int d){

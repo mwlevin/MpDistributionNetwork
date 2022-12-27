@@ -12,7 +12,7 @@ package mpdistributionnetwork;
 public class FC extends Node {
     
     // FCs have separate indices
-    private static int next_idx = 0;
+    
     private int idx;
     
     private OriginArc arc;
@@ -25,7 +25,7 @@ public class FC extends Node {
     public FC(String name, double lat, double lng, int num_zones, int capacity){
         super(name, lat, lng, num_zones, capacity);
         
-        idx = next_idx++;
+        idx = Network.fc_next_idx++;
         v = new int[Params.P];
         
     }
@@ -51,6 +51,7 @@ public class FC extends Node {
         for(int p = 0; p < arc.gamma.length; p++){
             for(int d = 0; d < arc.gamma[p].length; d++){
                 x[Params.SIZES[p]][d] += arc.gamma[p][d];
+                Network.new_packages += arc.gamma[p][d];
                 v[p] -= arc.gamma[p][d];
                 
                 /*

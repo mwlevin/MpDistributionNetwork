@@ -8,6 +8,7 @@ package mpdistributionnetwork;
 import ilog.concert.IloException;
 import java.util.ArrayList;
 import java.util.List;
+import org.openstreetmap.gui.jmapviewer.Coordinate;
 
 /**
  *
@@ -32,6 +33,12 @@ public abstract class Location implements Comparable<Location> {
         outgoing = new ArrayList<>();
     }
     
+    public Coordinate getCoordinate()
+    {
+        return new Coordinate(lat, lng);
+    }
+
+    
     public void addIncoming(Link l){
         incoming.add(l);
     }
@@ -51,6 +58,14 @@ public abstract class Location implements Comparable<Location> {
     }
     
     public double getLatitude(){
+        return lat;
+    }
+    
+    public double getY(){
+        return lng;
+    }
+    
+    public double getX(){
         return lat;
     }
     

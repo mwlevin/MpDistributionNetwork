@@ -43,6 +43,10 @@ public class Link {
 
     }
     
+    public Location[] getCoordinates(){
+        return new Location[]{start, dest};
+    }
+    
     public void setY(IloCplex cplex) throws IloException{
         
         
