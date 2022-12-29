@@ -61,6 +61,6 @@ public class ZIP3 extends Location {
     }
     
     public void update(){
-        // do nothing 
+        // do nothing
     }
 }

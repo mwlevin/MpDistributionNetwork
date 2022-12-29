@@ -8,6 +8,8 @@ package mpdistributionnetwork;
 import ilog.concert.IloException;
 import ilog.concert.IloIntVar;
 import ilog.cplex.IloCplex;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -18,6 +20,7 @@ public class Link {
     private Location start, dest;
     private double dist;
     protected int[][][] y; // 1st index is time
+    protected List<Shipment>[][][] y_track;
     protected IloIntVar[][] mpvar_y; // this is for 1st time step
     
     protected int tt;
@@ -36,6 +39,20 @@ public class Link {
         }
         
         y = new int[tt][Params.S][num_zones];
+        
+        if(Params.TRACK_PACKAGES){
+            y_track = new List[tt][Params.S][num_zones];
+
+            for(int t = 0; t < tt; t++){
+                for(int s = 0; s < y_track[t].length; s++){
+                    for(int d = 0; d < y_track[t][s].length; d++){
+                        y_track[t][s][d] = new ArrayList<>();
+                    }
+                }
+            }
+        }
+        
+        
         mpvar_y = new IloIntVar[Params.S][num_zones];
         
         start.addOutgoing(this);
@@ -58,6 +75,10 @@ public class Link {
                 else{
                     y[0][s][d] = 0;
                 }
+                
+                if(Params.TRACK_PACKAGES){
+                    y_track[0][s][d] = new ArrayList<>();
+                }
             }
         }
         
@@ -73,6 +94,10 @@ public class Link {
         
         for(int tau = y.length-1; tau > 0; tau--){
             y[tau] = y[tau-1];
+            
+            if(Params.TRACK_PACKAGES){
+                y_track[tau] = y_track[tau-1];
+            }
         }
         
         

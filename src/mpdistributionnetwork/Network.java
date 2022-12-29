@@ -292,8 +292,8 @@ public class Network {
     public static int total_delivered, total_packages, total_orders, new_orders, total_inventory, new_inventory, new_packages;
     public static boolean useMP;
     
-    private RunningAvg originTime;
-    private RunningAvg nodeTime;
+    private RunningAvg originTime, nodeTime, simTime;
+    public static RunningAvg fulfillTime, transportTime;
     private int sim_delivered;
     private int sim_packages;
     private int sim_orders;
@@ -302,6 +302,9 @@ public class Network {
         
         originTime = new RunningAvg();
         nodeTime = new RunningAvg();
+        simTime = new RunningAvg();
+        fulfillTime = new RunningAvg();
+        transportTime = new RunningAvg();
         
         out.println("Time\tOrders\tDemand\tInventory\tRestock\tTotal packages\tNew packages\tDelivered");
         
@@ -326,9 +329,12 @@ public class Network {
         
         out.println("Origin CPU time\t"+originTime.getAverage());
         out.println("Node CPU time\t"+nodeTime.getAverage());
+        out.println("Simulation time\t"+simTime.getAverage());
         out.println("Total packages\t"+sim_packages);
         out.println("Total orders\t"+sim_orders);
         out.println("Total delivered\t"+sim_delivered);
+        out.println("Fulfillment time\t"+fulfillTime.getAverage());
+        out.println("Transport time\t"+transportTime.getAverage());
     }
     
     public List<Node> getNodes(){
@@ -343,7 +349,8 @@ public class Network {
     
     public void step() throws IloException {
         
-        long time = System.nanoTime();
+        long time2 = System.nanoTime();
+        long time = time2;
         origin.step();
         
         originTime.add( (System.nanoTime() - time)/1.0e9);
@@ -356,7 +363,7 @@ public class Network {
             nodeTime.add( (System.nanoTime() - time)/1.0e9);
         }
         
-        
+        simTime.add((System.nanoTime()-time2)/1.0e9);
         
     }
     

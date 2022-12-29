@@ -50,9 +50,18 @@ public class FC extends Node {
         
         for(int p = 0; p < arc.gamma.length; p++){
             for(int d = 0; d < arc.gamma[p].length; d++){
-                x[Params.SIZES[p]][d] += arc.gamma[p][d];
-                Network.new_packages += arc.gamma[p][d];
-                v[p] -= arc.gamma[p][d];
+                int new_packages = arc.gamma[p][d]; 
+                x[Params.SIZES[p]][d] += new_packages;
+                Network.new_packages += new_packages;
+                v[p] -= new_packages;
+                
+                if(Params.TRACK_PACKAGES){
+                    for(int a = 0; a < new_packages; a++){
+                        Shipment ship = arc.gamma_track[p][d].get(a);
+                        ship.fulfill_time = Network.t;
+                        x_track[Params.SIZES[p]][d].add(ship);
+                    }
+                }
                 
                 /*
                 if(arc.gamma[p][d] > 0){

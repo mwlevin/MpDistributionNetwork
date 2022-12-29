@@ -36,7 +36,10 @@ public class Params {
     public static final double epsilon_cap = 0.1; // extra inventory deliveries
     
     
+    
+    
     public static final boolean PRINT_CPLEX = false;
+    public static final boolean TRACK_PACKAGES = true;
     
     public static final int NUM_ZONES = 1000;
     

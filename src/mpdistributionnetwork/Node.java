@@ -10,6 +10,7 @@ import ilog.concert.IloLinearNumExpr;
 import ilog.cplex.IloCplex;
 import java.util.HashSet;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 /**
@@ -19,6 +20,7 @@ import java.util.Set;
 public class Node extends Location{
     
     protected int[][] x; // first index is sizes, 2nd index is destination
+    protected PriorityQueue<Shipment>[][] x_track;
     protected double[] cost; // cost to go for destination
     
     private int capacity;
@@ -27,6 +29,17 @@ public class Node extends Location{
         super(name, lat, lng);
         
         x = new int[Params.S][num_zones];
+        
+        if(Params.TRACK_PACKAGES){
+            x_track = new PriorityQueue[Params.S][num_zones];
+
+            for(int s = 0; s < x_track.length; s++){
+                for(int d = 0; d < x_track[s].length; d++){
+                    x_track[s][d] = new PriorityQueue<>();
+                }
+            }
+        }
+        
         cost = new double[num_zones];
         this.capacity = capacity;
     }
@@ -60,6 +73,8 @@ public class Node extends Location{
         else {
             stepSimple();
         }
+        
+        
     }
     
     public void stepSimple(){
@@ -180,6 +195,7 @@ public class Node extends Location{
         
         for(Link ij : outgoing){
             ij.setY(cplex);
+            
         }
         
         cplex.end();
@@ -187,11 +203,33 @@ public class Node extends Location{
     
     public void update(){
         
+        if(Params.TRACK_PACKAGES){
+            for(Link ij : outgoing){
+            
+                for(int s = 0; s < x.length; s++){
+                    for(int d = 0; d < x[s].length; d++){
+                        for(int a = 0; a < ij.y[0][s][d]; a++){
+                            ij.y_track[0][s][d].add(x_track[s][d].remove());
+                        }
+                    }
+                }
+            }
+        }
+        
         for(int s = 0; s < x.length; s++){
             for(int d = 0; d < x[s].length; d++){
                 
                 for(Link inc : incoming){
-                    x[s][d] += inc.y[inc.tt-1][s][d];
+                    
+                    int added = inc.y[inc.tt-1][s][d];
+                    
+                    x[s][d] += added;
+                    
+                    if(Params.TRACK_PACKAGES){
+                        for(int a = 0; a < added; a++){
+                            x_track[s][d].add(inc.y_track[inc.tt-1][s][d].get(a));
+                        }
+                    }
                     
                     /*
                     if(inc.y[inc.tt-1][s][d] > 0){
@@ -210,11 +248,27 @@ public class Node extends Location{
                     }
                     */
 
+                    
                     if(out.getDest() instanceof ZIP3 && out.y[0][s][d] > 0){
                         //System.out.println("Delivered "+d);
-                        Network.total_delivered += out.y[0][s][d];
-                    }
+                        
 
+                        int deliver = out.y[0][s][d];
+                        Network.total_delivered += deliver;
+
+                        if(Params.TRACK_PACKAGES){
+                            for(int a = 0; a < deliver; a++){
+                                Shipment ship = out.y_track[0][s][d].get(a);
+
+                                int transport_time = Network.t - ship.fulfill_time;
+
+                                Network.fulfillTime.add(ship.fulfill_time);
+                                Network.transportTime.add(transport_time);
+                            }
+                        }
+
+                    }
+                    
                 }
                 
                 if(x[s][d] < 0){
@@ -228,6 +282,14 @@ public class Node extends Location{
         
         for(Link l : incoming){
             l.update();
+        }
+        
+        for(int s = 0; s < x.length; s++){
+            for(int d = 0; d < x[s].length; d++){
+                if(x[s][d] != x_track[s][d].size()){
+                    throw new RuntimeException("Size mismatch "+x[s][d]+" "+x_track[s][d].size()+" "+getClass().getName());
+                }
+            }
         }
     }
 

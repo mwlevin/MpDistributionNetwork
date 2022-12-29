@@ -8,6 +8,7 @@ package mpdistributionnetwork;
 import ilog.concert.IloException;
 import ilog.concert.IloLinearNumExpr;
 import ilog.cplex.IloCplex;
+import java.util.PriorityQueue;
 
 /**
  *
@@ -18,6 +19,7 @@ public class Origin {
     private OriginArc[] arcs; // index is fc
     
     private int[][] chi; // first index is product, 2nd index is destination
+    private PriorityQueue<Shipment>[][] chi_track;
     
     private Demand dem[][];
 
@@ -27,6 +29,15 @@ public class Origin {
         
         
         chi = new int[Params.P][num_zones];
+        
+        if(Params.TRACK_PACKAGES){
+            chi_track = new PriorityQueue[Params.P][num_zones];
+            for(int p = 0; p < chi_track.length; p++){
+                for(int d = 0; d < chi_track[p].length; d++){
+                    chi_track[p][d] = new PriorityQueue<>();
+                }
+            }
+        }
  
         this.dem = dem;
         arcs = new OriginArc[num_fc];
@@ -46,7 +57,10 @@ public class Origin {
         else{
             stepSimple();
         }
+        
     }
+    
+    
     
     public void stepSimple() throws IloException {
         
@@ -225,19 +239,40 @@ public class Origin {
         }
         */
         
+        if(Params.TRACK_PACKAGES){
+            for(int i = 0; i < arcs.length; i++){
+            
+                for(int p = 0; p < chi.length; p++){
+                    for(int d = 0; d < chi[p].length; d++){
+                        for(int j = 0; j < arcs[i].gamma[p][d]; j++){
+                            arcs[i].gamma_track[p][d].add(chi_track[p][d].remove());
+                        }
+                    }
+                }
+            }
+        }
+        
         
         for(int p = 0; p < chi.length; p++){
             for(int d = 0; d < chi[p].length; d++){
 
                 double orders = dem[p][d].nextDraw();
                 chi[p][d] += orders;
+                
+                if(Params.TRACK_PACKAGES){
+                    for(int i = 0; i < orders; i++){
+                        chi_track[p][d].add(new Shipment(p, d));
+                    }
+                }
+                
                 Network.new_orders += orders;
                 
                 int total = 0;
                 
                 for(int i = 0; i < arcs.length; i++){
-                    total += arcs[i].gamma[p][d];
-                    chi[p][d] -= arcs[i].gamma[p][d];
+                    int moved = arcs[i].gamma[p][d];
+                    total += moved;
+                    chi[p][d] -= moved;
                 }
                 
                 if(chi[p][d] < 0){
