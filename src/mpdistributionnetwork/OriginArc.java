@@ -9,6 +9,7 @@ import ilog.concert.IloException;
 import ilog.concert.IloIntVar;
 import ilog.cplex.IloCplex;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -20,14 +21,14 @@ public class OriginArc {
     protected FC fc;
     
     protected int gamma[][]; // 1st index is product, 2nd index is dest
-    protected List<Shipment> gamma_track[][];
+    protected ArrayList<Shipment> gamma_track[][];
     
     protected IloIntVar mpvar_gamma[][];
     
     
     public OriginArc(int num_zones, FC fc, Network network){
         gamma = new int[network.params.P][num_zones];
-        gamma_track = new List[network.params.P][num_zones];
+        gamma_track = new ArrayList[network.params.P][num_zones];
         
         for(int p = 0; p < gamma_track.length; p++){
             for(int d = 0; d < gamma_track[p].length; d++){

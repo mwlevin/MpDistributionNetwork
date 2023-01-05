@@ -9,6 +9,7 @@ import ilog.concert.IloException;
 import ilog.concert.IloIntVar;
 import ilog.cplex.IloCplex;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -20,7 +21,7 @@ public class Link {
     private Location start, dest;
     private double dist;
     protected int[][][] y; // 1st index is time
-    protected List<Shipment>[][][] y_track;
+    protected ArrayList<Shipment>[][][] y_track;
     protected IloIntVar[][] mpvar_y; // this is for 1st time step
     
     protected int tt;
@@ -33,7 +34,7 @@ public class Link {
         
         
         this.tt = (int)Math.max(1, Math.ceil(this.dist / network.params.SPEED));
-        
+                
         if(dest instanceof ZIP3){
             tt = 1;
         }
@@ -41,7 +42,7 @@ public class Link {
         y = new int[tt][network.params.S][num_zones];
         
         if(network.params.TRACK_PACKAGES){
-            y_track = new List[tt][network.params.S][num_zones];
+            y_track = new ArrayList[tt][network.params.S][num_zones];
 
             for(int t = 0; t < tt; t++){
                 for(int s = 0; s < y_track[t].length; s++){

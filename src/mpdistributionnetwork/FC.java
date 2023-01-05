@@ -5,6 +5,8 @@
  */
 package mpdistributionnetwork;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author micha
@@ -69,14 +71,31 @@ public class FC extends Node {
                 v[p] -= new_packages;
                 
                 if(network.params.TRACK_PACKAGES){
+                    
+                    ArrayList<Shipment> orig = arc.gamma_track[p][d];
                     for(int a = 0; a < new_packages; a++){
-                        Shipment ship = arc.gamma_track[p][d].get(a);
+                        
+                        // this should be a removal. Removing it at end.
+                        Shipment ship = orig.get(a);
+                        
                         ship.fulfill_time = network.t;
                         
                         
-                        Network.fulfillTime.add(ship.fulfill_time - ship.create_time);
+                        network.fulfill_time.add(ship.fulfill_time - ship.create_time);
+                        network.fulfill_test.add(ship.fulfill_time - ship.create_time);
+                        
+                        //System.out.println(ship.fulfill_time+"\t"+ship.create_time+"\t"+(ship.fulfill_time - ship.create_time)+"\t"+network.fulfill_time.getAverage());
+
                         x_track[network.params.SIZES[p]][d].add(ship);
                     }
+                    
+                    ArrayList<Shipment> temp = new ArrayList<>();
+                    
+                    for(int a = new_packages; a < orig.size(); a++){
+                        temp.add(orig.get(a));
+                    }
+                    
+                    arc.gamma_track[p][d] = temp;
                 }
                 
                 /*

@@ -67,7 +67,7 @@ public class Params {
             out = System.out;
         }
         else{
-            out = new PrintStream(new FileOutputStream(new File("log.txt"), true));
+            out = new PrintStream(new FileOutputStream(new File("log.txt")), true);
         }
     }
     

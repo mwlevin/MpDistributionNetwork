@@ -34,13 +34,15 @@ public class Network {
     
     public Params params;
     
-    public Random rand = new Random(1234);
+    public Random rand;
 
     
     public Network(boolean mp, Params params) throws IOException {
         this.params = params;
         zip3_next_idx = 0;
         fc_next_idx = 0;
+        
+        rand = new Random(1234);
         
         useMP = mp;
         
@@ -166,7 +168,7 @@ public class Network {
         
         for(int d = 0; d < dests.length; d++){
             for(int p = 0; p < params.P; p++){
-                prob[p][d] = rand.nextDouble() * dests[d].getPopulation();
+                prob[p][d] = (rand.nextDouble()) * dests[d].getPopulation();
                 total_p[p] += prob[p][d];
             }
         }
@@ -295,7 +297,7 @@ public class Network {
     public boolean useMP;
     
     private RunningAvg originTime, nodeTime, simTime;
-    public static RunningAvg fulfillTime, transportTime;
+    public RunningAvg fulfill_time, transport_time, fulfill_test;
     private int sim_delivered;
     private int sim_packages;
     private int sim_orders;
@@ -327,33 +329,23 @@ public class Network {
         originTime = new RunningAvg();
         nodeTime = new RunningAvg();
         simTime = new RunningAvg();
-        fulfillTime = new RunningAvg();
-        transportTime = new RunningAvg();
+        fulfill_time = new RunningAvg();
+        transport_time = new RunningAvg();
         
-        out.println("Time\tOrders\tDemand\tInventory\tRestock\tTotal packages\tNew packages\tDelivered");
         
-        /*
-        for(int t = 0; t < 12; t++){
+        out.println("Time\tOrders\tDemand\tInventory\tRestock\tTotal packages\tNew packages\tDelivered\tAvg fulfillment time\tAvg. transport time");
+        
+        
+        for(int t = 0; t < 1; t++){
             for(FC f : fcs){
-                f.restock();
+                f.restock(this);
             }
         }
         
-        for(FC f : fcs){
-            System.out.println(f.getName()+": "+f.getInventory());
-        }
-        */
+
+        
         
         for(t = 0; t < params.T; t++){
-            
-            step();
-            update();
-            out.println(t+"\t"+total_orders+"\t"+new_orders+"\t"+total_inventory+"\t"+new_inventory+"\t"+total_packages+"\t"+new_packages+"\t"+total_delivered);
-            
-            sim_orders += new_orders;
-            sim_delivered += total_delivered;
-            sim_packages += new_packages;
-            
             total_orders = 0;
             total_packages = 0;
             total_delivered = 0;
@@ -361,6 +353,19 @@ public class Network {
             new_inventory = 0;
             new_orders = 0;
             new_packages = 0;
+            
+            fulfill_test = new RunningAvg();
+            
+            step();
+            update();
+            out.println(t+"\t"+origin.getNumOrders()+"\t"+new_orders+"\t"+total_inventory+"\t"+new_inventory+"\t"+total_packages+"\t"+new_packages+"\t"+total_delivered+"\t"+
+                    fulfill_time.getAverage()+"\t"+transport_time.getAverage());
+            
+            sim_orders += new_orders;
+            sim_delivered += total_delivered;
+            sim_packages += new_packages;
+            
+            
         }
         
         out.println("Origin CPU time\t"+originTime.getAverage());
@@ -369,8 +374,8 @@ public class Network {
         out.println("Total packages\t"+sim_packages);
         out.println("Total orders\t"+sim_orders);
         out.println("Total delivered\t"+sim_delivered);
-        out.println("Fulfillment time\t"+fulfillTime.getAverage());
-        out.println("Transport time\t"+transportTime.getAverage());
+        out.println("Fulfillment time\t"+fulfill_time.getAverage());
+        out.println("Transport time\t"+transport_time.getAverage());
         
         
         out.println("\t");

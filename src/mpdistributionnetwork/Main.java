@@ -27,7 +27,22 @@ public class Main {
 
         boolean mp = false;
         
-        for(int x = 10; x <= 40; x += 5){
+        for(int x = 40; x >= 10; x -= 5){
+            Params params = new Params();
+            params.epsilon_cap = params.epsilon_inv = x/100.0;
+            
+            PrintStream out = new PrintStream(new FileOutputStream("log_"+params.epsilon_cap+"_beta"+params.beta+"_"+mp+".txt"), true);
+            Network test = new Network(mp, params);
+            test.simulate(System.out);
+
+            test = null;
+            
+            System.gc();
+        }
+        
+        mp = true;
+        
+        for(int x = 40; x >= 10; x -= 5){
             Params params = new Params();
             params.epsilon_cap = params.epsilon_inv = x/100.0;
             
@@ -36,6 +51,8 @@ public class Main {
             test.simulate(out);
 
             test = null;
+            
+            System.gc();
         }
         
         /*

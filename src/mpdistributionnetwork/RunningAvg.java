@@ -49,7 +49,7 @@ public class RunningAvg implements Serializable
 	{
             value += val;
             x_squared += val*val;
-            count++;
+            count += 1;
 	}
         
         /**

@@ -26,6 +26,8 @@ public class Shipment implements Comparable<Shipment> {
         return create_time - rhs.create_time;
     }
 
-    
+    public String toString(){
+        return ""+create_time;
+    }
     
 }

@@ -245,7 +245,11 @@ public class Origin {
                 for(int p = 0; p < chi.length; p++){
                     for(int d = 0; d < chi[p].length; d++){
                         for(int j = 0; j < arcs[i].gamma[p][d]; j++){
-                            arcs[i].gamma_track[p][d].add(chi_track[p][d].remove());
+                            Shipment next = chi_track[p][d].remove();
+                            arcs[i].gamma_track[p][d].add(next);
+                            
+                            
+                            
                         }
                     }
                 }
@@ -282,5 +286,20 @@ public class Origin {
                 network.total_orders += chi[p][d];
             }
         }
+    }
+    
+    public int getNumOrders(){
+        int output = 0;
+
+        
+        for(int p = 0; p < chi.length; p++){
+            for(int d = 0; d < chi[p].length; d++){
+                output += chi[p][d];
+
+            }
+        }
+        
+
+        return output;
     }
 }

@@ -8,6 +8,7 @@ package mpdistributionnetwork;
 import ilog.concert.IloException;
 import ilog.concert.IloLinearNumExpr;
 import ilog.cplex.IloCplex;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -73,13 +74,13 @@ public class Node extends Location{
             stepMP(network);
         }
         else {
-            stepSimple();
+            stepSimple(network);
         }
         
         
     }
     
-    public void stepSimple(){
+    public void stepSimple(Network network){
         
         int remainingCap = capacity;
         
@@ -88,6 +89,10 @@ public class Node extends Location{
             for(int s = 0; s < x.length; s++){
                 for(int d = 0; d < x[s].length; d++){
                     ij.y[0][s][d] = 0;
+                    
+                    if(network.params.TRACK_PACKAGES){
+                        ij.y_track[0][s][d] = new ArrayList<Shipment>();
+                    }
                 }
             }
         }
@@ -229,9 +234,22 @@ public class Node extends Location{
                     total_processed += added;
                     
                     if(network.params.TRACK_PACKAGES){
+                        
+                        ArrayList<Shipment> orig = inc.y_track[inc.tt-1][s][d];
                         for(int a = 0; a < added; a++){
-                            x_track[s][d].add(inc.y_track[inc.tt-1][s][d].get(a));
+                            // this should be a removal. Removing it at end
+                            x_track[s][d].add(orig.get(a));
                         }
+                        
+                        
+                        ArrayList<Shipment> temp = new ArrayList<>();
+                        
+                        for(int a = added; a < orig.size(); a++){
+                            temp.add(orig.get(a));
+                        }
+                            
+                            
+                        inc.y_track[inc.tt-1][s][d] = temp;
                     }
                     
                     /*
@@ -263,11 +281,11 @@ public class Node extends Location{
                             for(int a = 0; a < deliver; a++){
                                 Shipment ship = out.y_track[0][s][d].get(a);
 
-                                int transport_time = network.t - ship.fulfill_time+1;
+                                int transport_time = network.t - ship.fulfill_time + out.tt;
 
-                                
-                                Network.transportTime.add(transport_time);
+                                network.transport_time.add(transport_time);
                             }
+                            
                         }
 
                     }

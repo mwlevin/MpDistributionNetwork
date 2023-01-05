@@ -43,6 +43,7 @@ public class Poisson implements RandomVar {
             if(p > 0.01){
                 found = true;
             }
+            
             temp.add(p);
         }
         cdf = new double[temp.size()];
