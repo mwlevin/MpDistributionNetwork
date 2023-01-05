@@ -89,13 +89,8 @@ public class FC extends Node {
                         x_track[network.params.SIZES[p]][d].add(ship);
                     }
                     
-                    ArrayList<Shipment> temp = new ArrayList<>();
+                    orig.clear();
                     
-                    for(int a = new_packages; a < orig.size(); a++){
-                        temp.add(orig.get(a));
-                    }
-                    
-                    arc.gamma_track[p][d] = temp;
                 }
                 
                 /*

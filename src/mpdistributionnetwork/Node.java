@@ -241,15 +241,9 @@ public class Node extends Location{
                             x_track[s][d].add(orig.get(a));
                         }
                         
+                        orig.clear();
                         
-                        ArrayList<Shipment> temp = new ArrayList<>();
-                        
-                        for(int a = added; a < orig.size(); a++){
-                            temp.add(orig.get(a));
-                        }
-                            
-                            
-                        inc.y_track[inc.tt-1][s][d] = temp;
+
                     }
                     
                     /*
