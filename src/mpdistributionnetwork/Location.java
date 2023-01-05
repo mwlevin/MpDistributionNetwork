@@ -47,8 +47,8 @@ public abstract class Location implements Comparable<Location> {
         outgoing.add(l);
     }
     
-    public abstract void step() throws IloException ;
-    public abstract void update();
+    public abstract void step(Network network) throws IloException ;
+    public abstract void update(Network network);
     public abstract void setCost(ZIP3 d, double cost);
     public abstract double getCost(int d);
     public abstract boolean isValidDest(int d);

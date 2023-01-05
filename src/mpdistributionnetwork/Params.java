@@ -16,44 +16,44 @@ import java.util.Random;
  * @author micha
  */
 public class Params {
-    public static final int P = 20;
-    public static final int[] SIZE = new int[]{P/2}; // size cutoff
-    public static final int S = SIZE.length+1;
+    public final int P = 20;
+    public final int[] SIZE = new int[]{P/2}; // size cutoff
+    public final int S = SIZE.length+1;
     
     
-    public static final int DAY = 24;
-    public static final int T = 30*DAY;
+    public final int DAY = 24;
+    public final int T = 30*DAY;
     
-    public static final double SPEED = 60.0 * 24.0/DAY;
+    public final double SPEED = 60.0 * 24.0/DAY;
     
-    public static double beta = 0.05;
-    public static double node_beta = 0.05;
+    public double beta = 0.05;
+    public double node_beta = 0.05;
     
-    public static final int FC_CAPACITY = (int)Math.round(100 * 24.0/DAY);
-    public static final int SC_CAPACITY = (int)Math.round(400 * 24.0/DAY);
-    public static final int DS_CAPACITY = (int)Math.round(1000 * 24.0/DAY);
+    public final int FC_CAPACITY = (int)Math.round(100 * 24.0/DAY);
+    public final int SC_CAPACITY = (int)Math.round(400 * 24.0/DAY);
+    public final int DS_CAPACITY = (int)Math.round(1000 * 24.0/DAY);
     
-    public static double epsilon_inv = 0.1; // extra inventory deliveries
-    public static double epsilon_cap = 0.1; // extra inventory deliveries
+    public double epsilon_inv = 0.1; // extra inventory deliveries
+    public double epsilon_cap = 0.1; // extra inventory deliveries
     
     
     
     
     public static final boolean PRINT_CPLEX = false;
-    public static final boolean TRACK_PACKAGES = true;
+    public final boolean TRACK_PACKAGES = true;
     
-    public static final int NUM_ZONES = 1000;
+    public final int NUM_ZONES = 1000;
     
-    public static PrintStream out;
-    public static Random rand = new Random(1234);
-    
-    public static final int inventory_max = 30;
+    public PrintStream out;
     
     
+    public final int inventory_max = 30;
     
-    public static int[] SIZES = new int[P];
     
-    public static void init() throws IOException{
+    
+    public int[] SIZES = new int[P];
+    
+    public Params() throws IOException{
         int s = 0;
         for(int p = 0; p < P; p++){
             if(s < SIZE.length && p >= SIZE[s]){

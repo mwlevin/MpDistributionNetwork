@@ -12,8 +12,8 @@ import java.util.Set;
  * @author micha
  */
 public class SC extends Node {
-    public SC(String name, double lat, double lng, int num_zones, int capacity){
-        super(name, lat, lng, num_zones, capacity);
+    public SC(String name, double lat, double lng, int num_zones, int capacity, Network network){
+        super(name, lat, lng, num_zones, capacity, network);
     }
     
     public boolean isValidDest(int d){

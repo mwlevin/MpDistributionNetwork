@@ -23,15 +23,15 @@ public class Origin {
     
     protected Demand dem[][];
 
-    public Origin(FC[] fc, Demand dem[][]){
+    public Origin(FC[] fc, Demand dem[][], Network network){
         int num_fc = fc.length;
         int num_zones = dem[0].length;
         
         
-        chi = new int[Params.P][num_zones];
+        chi = new int[network.params.P][num_zones];
         
-        if(Params.TRACK_PACKAGES){
-            chi_track = new PriorityQueue[Params.P][num_zones];
+        if(network.params.TRACK_PACKAGES){
+            chi_track = new PriorityQueue[network.params.P][num_zones];
             for(int p = 0; p < chi_track.length; p++){
                 for(int d = 0; d < chi_track[p].length; d++){
                     chi_track[p][d] = new PriorityQueue<>();
@@ -45,14 +45,14 @@ public class Origin {
         this.dem = dem;
         
         for(int i = 0; i < arcs.length; i++){
-            arcs[i] = new OriginArc(num_zones, fc[i]);
+            arcs[i] = new OriginArc(num_zones, fc[i], network);
         }
     }
     
     
-    public void step() throws IloException {
-        if(Network.useMP){
-            stepMP();
+    public void step(Network network) throws IloException {
+        if(network.useMP){
+            stepMP(network);
         }
         else{
             stepSimple();
@@ -129,9 +129,9 @@ public class Origin {
         }
     }
     
-    public void stepMP() throws IloException {
+    public void stepMP(Network network) throws IloException {
         IloCplex cplex = new IloCplex();
-        cplex.setOut(Params.out);
+        cplex.setOut(network.params.out);
         
         IloLinearNumExpr obj = cplex.linearNumExpr();
         for(int p = 0; p < chi.length; p++){
@@ -139,9 +139,9 @@ public class Origin {
                     //System.out.println("***** "+p+" "+d);
                 for(int i = 0; i < arcs.length; i++){
                     if(chi[p][d] > 0){
-                        int omega = chi[p][d] - arcs[i].fc.x[Params.SIZES[p]][d];
+                        int omega = chi[p][d] - arcs[i].fc.x[network.params.SIZES[p]][d];
 
-                        double obj_weight = omega - Params.beta * arcs[i].fc.getCost(d);
+                        double obj_weight = omega - network.params.beta * arcs[i].fc.getCost(d);
                         //double obj_weight = omega;
                         
 
@@ -220,7 +220,7 @@ public class Origin {
        
     }
     
-    public void update(){
+    public void update(Network network){
         /*
         for(int p = 0; p < chi.length; p++){
             
@@ -239,7 +239,7 @@ public class Origin {
         }
         */
         
-        if(Params.TRACK_PACKAGES){
+        if(network.params.TRACK_PACKAGES){
             for(int i = 0; i < arcs.length; i++){
             
                 for(int p = 0; p < chi.length; p++){
@@ -256,16 +256,16 @@ public class Origin {
         for(int p = 0; p < chi.length; p++){
             for(int d = 0; d < chi[p].length; d++){
 
-                double orders = dem[p][d].nextDraw();
+                double orders = dem[p][d].nextDraw(network);
                 chi[p][d] += orders;
                 
-                if(Params.TRACK_PACKAGES){
+                if(network.params.TRACK_PACKAGES){
                     for(int i = 0; i < orders; i++){
-                        chi_track[p][d].add(new Shipment(p, d));
+                        chi_track[p][d].add(new Shipment(p, d, network.t));
                     }
                 }
                 
-                Network.new_orders += orders;
+                network.new_orders += orders;
                 
                 int total = 0;
                 
@@ -279,7 +279,7 @@ public class Origin {
                     throw new RuntimeException("chi[p][d] < 0 "+ chi[p][d]);
                 }
                 
-                Network.total_orders += chi[p][d];
+                network.total_orders += chi[p][d];
             }
         }
     }

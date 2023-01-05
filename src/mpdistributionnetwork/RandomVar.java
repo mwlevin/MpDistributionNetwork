@@ -10,6 +10,6 @@ package mpdistributionnetwork;
  * @author micha
  */
 public interface RandomVar {
-    public int nextDraw();
+    public int nextDraw(Network network);
     public double getAvg();
 }

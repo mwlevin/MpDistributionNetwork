@@ -24,14 +24,15 @@ public class Main {
     public static void main(String[] args) throws IloException, Exception {
         // TODO code application logic here
 
-        Params.init();
-        
+
         boolean mp = false;
         
         for(int x = 10; x <= 40; x += 5){
-            Params.epsilon_cap = Params.epsilon_inv = x/100.0;
-            PrintStream out = new PrintStream(new FileOutputStream("log_"+Params.epsilon_cap+"_beta"+Params.beta+"_"+mp+".txt"), true);
-            Network test = new Network(mp);
+            Params params = new Params();
+            params.epsilon_cap = params.epsilon_inv = x/100.0;
+            
+            PrintStream out = new PrintStream(new FileOutputStream("log_"+params.epsilon_cap+"_beta"+params.beta+"_"+mp+".txt"), true);
+            Network test = new Network(mp, params);
             test.simulate(out);
 
             test = null;

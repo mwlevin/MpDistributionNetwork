@@ -17,8 +17,8 @@ public class DS extends Node {
     private Set<Integer> valid_zip;
     
     
-    public DS(String name, double lat, double lng, int num_zones, int capacity){
-        super(name, lat, lng, num_zones, capacity);
+    public DS(String name, double lat, double lng, int num_zones, int capacity, Network network){
+        super(name, lat, lng, num_zones, capacity, network);
         
         valid_zip = new HashSet<>();
     }

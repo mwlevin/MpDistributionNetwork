@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Random;
 import java.util.Scanner;
 
 /**
@@ -21,8 +22,8 @@ import java.util.Scanner;
  */
 public class Network {
     
-    public static int zip3_next_idx = 0;
-    public static int fc_next_idx = 0;
+    public int zip3_next_idx = 0;
+    public int fc_next_idx = 0;
     
     private FC[] fcs;
     private ZIP3[] dests;
@@ -30,10 +31,14 @@ public class Network {
     private List<Node> all_nodes;
     
     private Origin origin;
+    
+    public Params params;
+    
+    public Random rand = new Random(1234);
 
     
-    public Network(boolean mp) throws IOException {
-        
+    public Network(boolean mp, Params params) throws IOException {
+        this.params = params;
         zip3_next_idx = 0;
         fc_next_idx = 0;
         
@@ -58,11 +63,11 @@ public class Network {
             int pop = filein.nextInt();
             
 
-            zips.add(new ZIP3(zip, lat, lng, pop));
+            zips.add(new ZIP3(zip, lat, lng, pop, this));
             
             count++;
             
-            if(count == Params.NUM_ZONES){
+            if(count == params.NUM_ZONES){
                 break;
             }
         }
@@ -93,7 +98,7 @@ public class Network {
             }
             name = name.replaceAll("#", "");
       
-            fc.add(new FC(name, lat, lng, dests.length, Params.FC_CAPACITY));
+            fc.add(new FC(name, lat, lng, dests.length, params.FC_CAPACITY, this));
         }
         filein.close();
         
@@ -112,13 +117,13 @@ public class Network {
             total_capacity += f.getCapacity();
         }
         
-        total_capacity /= (1+Params.epsilon_cap);
+        total_capacity /= (1+params.epsilon_cap);
         
-        double[] total = new double[Params.P];
+        double[] total = new double[params.P];
         
         double total_prob = 0;
         for(int p = 0; p < total.length; p++){
-            total[p] = Params.rand.nextDouble();
+            total[p] = rand.nextDouble();
             total_prob += total[p];
         }
 
@@ -130,13 +135,13 @@ public class Network {
         
         
         
-        double[][] prob = new double[fcs.length][Params.P];
+        double[][] prob = new double[fcs.length][params.P];
         
-        double[] total_p = new double[Params.P];
+        double[] total_p = new double[params.P];
         
         for(int f = 0; f < fcs.length; f++){
-            for(int p = 0; p < Params.P; p++){
-                prob[f][p] = Params.rand.nextDouble();
+            for(int p = 0; p < params.P; p++){
+                prob[f][p] = rand.nextDouble();
                 total_p[p] += prob[f][p];
             }
         }
@@ -144,10 +149,10 @@ public class Network {
         double total_inv = 0;
         
         for(int f = 0; f < fcs.length; f++){
-            Restock[] r = new Restock[Params.P];
+            Restock[] r = new Restock[params.P];
             
-            for(int p = 0; p < Params.P; p++){
-                r[p] = new Restock(prob[f][p] / total_p[p] * (1+Params.epsilon_inv)*total[p]);
+            for(int p = 0; p < params.P; p++){
+                r[p] = new Restock(prob[f][p] / total_p[p] * (1+params.epsilon_inv)*total[p]);
                 
                 total_inv += r[p].getAvg();
             }
@@ -156,21 +161,21 @@ public class Network {
             
         }
         
-        prob = new double[Params.P][dests.length];
-        total_p = new double[Params.P];
+        prob = new double[params.P][dests.length];
+        total_p = new double[params.P];
         
         for(int d = 0; d < dests.length; d++){
-            for(int p = 0; p < Params.P; p++){
-                prob[p][d] = Params.rand.nextDouble() * dests[d].getPopulation();
+            for(int p = 0; p < params.P; p++){
+                prob[p][d] = rand.nextDouble() * dests[d].getPopulation();
                 total_p[p] += prob[p][d];
             }
         }
         
-        Demand[][] dem = new Demand[Params.P][dests.length];
+        Demand[][] dem = new Demand[params.P][dests.length];
         
         double total_lambda = 0;
         for(int d = 0; d < dests.length; d++){
-            for(int p = 0; p < Params.P; p++){
+            for(int p = 0; p < params.P; p++){
                 dem[p][d] = new Demand(prob[p][d] / total_p[p] * total[p]);
                 total_lambda += dem[p][d].getAvg();
             }
@@ -197,7 +202,7 @@ public class Network {
                 name = name.substring(0, name.indexOf('/'));
             }
             name = name.replaceAll("#", "");
-            SC sc = new SC(name, lat, lng, dests.length, Params.SC_CAPACITY);
+            SC sc = new SC(name, lat, lng, dests.length, params.SC_CAPACITY, this);
             all_nodes.add(sc);
             scs.add(sc);
         }
@@ -218,7 +223,7 @@ public class Network {
             }
             name = name.replaceAll("#", "");
             
-            DS ds = new DS(name, lat, lng, dests.length, Params.DS_CAPACITY);
+            DS ds = new DS(name, lat, lng, dests.length, params.DS_CAPACITY, this);
             all_nodes.add(ds);
             dss.add(ds);
         }
@@ -233,28 +238,28 @@ public class Network {
         
         for(FC f : fcs){
             for(SC s : scs){
-                new Link(f, s, dests.length);
+                new Link(f, s, dests.length, this);
             }
         }
         
         for(SC s : scs){
             for(Node d : dss){
-                new Link(s, d, dests.length);
+                new Link(s, d, dests.length, this);
             }
         }
         
         for(FC f : fcs){
             for(Node d : dss){
-                if(Params.haversine(f, d) <= Params.SPEED){
-                    new Link(f, d, dests.length);
+                if(params.haversine(f, d) <= params.SPEED){
+                    new Link(f, d, dests.length, this);
                 }
             }
         }
         
         for(DS d : dss){
             for(ZIP3 z : dests){
-                if(Params.haversine(d, z) <= Params.SPEED){
-                    new Link(d, z, dests.length);
+                if(params.haversine(d, z) <= params.SPEED){
+                    new Link(d, z, dests.length, this);
                 }
             }
         }
@@ -267,7 +272,7 @@ public class Network {
                 double min = Integer.MAX_VALUE;
                 
                 for(DS d : dss){
-                    double temp = Params.haversine(d, z);
+                    double temp = params.haversine(d, z);
                     if(temp < min){
                         min = temp;
                         best = d;
@@ -275,19 +280,19 @@ public class Network {
                 }
                 
                 
-                new Link(best, z, dests.length);
+                new Link(best, z, dests.length, this);
             }
         }
         
 
         
-        origin = new Origin(fcs, dem);
+        origin = new Origin(fcs, dem, this);
         calcCosts();
     }
     
-    public static int t;
-    public static int total_delivered, total_packages, total_orders, new_orders, total_inventory, new_inventory, new_packages;
-    public static boolean useMP;
+    public int t;
+    public int total_delivered, total_packages, total_orders, new_orders, total_inventory, new_inventory, new_packages;
+    public boolean useMP;
     
     private RunningAvg originTime, nodeTime, simTime;
     public static RunningAvg fulfillTime, transportTime;
@@ -299,14 +304,14 @@ public class Network {
         
         double total_lambda = 0;
         for(int d = 0; d < dests.length; d++){
-            for(int p = 0; p < Params.P; p++){
+            for(int p = 0; p < params.P; p++){
                 total_lambda += origin.dem[p][d].getAvg();
             }
         }
 
         double total_inv = 0;
         for(int f = 0; f < fcs.length; f++){
-            for(int p = 0; p < Params.P; p++){
+            for(int p = 0; p < params.P; p++){
                 total_inv += fcs[f].getRestock()[p].getAvg();
             }
             
@@ -315,9 +320,9 @@ public class Network {
         out.println("Total demand\t"+total_lambda);
         out.println("Total restock\t"+total_inv);
         out.println("MP\t"+useMP);
-        out.println("FC capacity\t"+Params.FC_CAPACITY);
-        out.println("SC capacity\t"+Params.SC_CAPACITY);
-        out.println("DS capacity\t"+Params.DS_CAPACITY);
+        out.println("FC capacity\t"+params.FC_CAPACITY);
+        out.println("SC capacity\t"+params.SC_CAPACITY);
+        out.println("DS capacity\t"+params.DS_CAPACITY);
 
         originTime = new RunningAvg();
         nodeTime = new RunningAvg();
@@ -339,7 +344,7 @@ public class Network {
         }
         */
         
-        for(t = 0; t < Params.T; t++){
+        for(t = 0; t < params.T; t++){
             
             step();
             update();
@@ -373,7 +378,7 @@ public class Network {
         /*
         for(Node n : all_nodes){
             if(n instanceof SC){
-                out.println("SC "+n.getName()+"\t"+((double)((SC) n).total_processed / Params.T));
+                out.println("SC "+n.getName()+"\t"+((double)((SC) n).total_processed / params.T));
             }
         }
         */
@@ -393,14 +398,14 @@ public class Network {
         
         long time2 = System.nanoTime();
         long time = time2;
-        origin.step();
+        origin.step(this);
         
         originTime.add( (System.nanoTime() - time)/1.0e9);
         
         
         for(Location n : all_nodes){
             time = System.nanoTime();
-            n.step();
+            n.step(this);
             
             nodeTime.add( (System.nanoTime() - time)/1.0e9);
         }
@@ -411,10 +416,10 @@ public class Network {
     
     public void update(){
         
-        origin.update();
+        origin.update(this);
         
         for(Location n : all_nodes){
-            n.update();
+            n.update(this);
         }
         
         
@@ -455,7 +460,7 @@ public class Network {
             u.inQ = false;
             
             for(Link uv : u.incoming){
-                double temp = u.label + uv.getCost();
+                double temp = u.label + uv.getCost(this);
                 Location v = uv.getStart();
                 
                 if(temp < v.label){

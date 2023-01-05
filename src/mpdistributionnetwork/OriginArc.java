@@ -25,9 +25,9 @@ public class OriginArc {
     protected IloIntVar mpvar_gamma[][];
     
     
-    public OriginArc(int num_zones, FC fc){
-        gamma = new int[Params.P][num_zones];
-        gamma_track = new List[Params.P][num_zones];
+    public OriginArc(int num_zones, FC fc, Network network){
+        gamma = new int[network.params.P][num_zones];
+        gamma_track = new List[network.params.P][num_zones];
         
         for(int p = 0; p < gamma_track.length; p++){
             for(int d = 0; d < gamma_track[p].length; d++){
@@ -36,7 +36,7 @@ public class OriginArc {
         }
         
         
-        mpvar_gamma = new IloIntVar[Params.P][num_zones];
+        mpvar_gamma = new IloIntVar[network.params.P][num_zones];
         this.fc = fc;
         fc.setOriginArc(this);
 

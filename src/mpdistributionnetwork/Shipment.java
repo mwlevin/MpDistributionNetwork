@@ -16,8 +16,8 @@ public class Shipment implements Comparable<Shipment> {
     public int fulfill_time;
     
     
-    public Shipment(int p, int d){
-        create_time = Network.t;
+    public Shipment(int p, int d, int t){
+        create_time = t;
         this.p = p;
         this.d = d;
     }

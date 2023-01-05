@@ -16,11 +16,11 @@ public class ZIP3 extends Location {
     private int pop;
     private int zip;
     
-    public ZIP3(int zip, double lat, double lng, int pop){
+    public ZIP3(int zip, double lat, double lng, int pop, Network network){
         super(""+zip, lat, lng);
         this.pop = pop;
         
-        idx = Network.zip3_next_idx++;
+        idx = network.zip3_next_idx++;
     }
     
     public int getIdx(){
@@ -56,11 +56,11 @@ public class ZIP3 extends Location {
         return zip;
     }
     
-    public void step(){
+    public void step(Network network){
         // do nothing 
     }
     
-    public void update(){
+    public void update(Network network){
         // do nothing
     }
 }

@@ -55,18 +55,9 @@ public class Poisson implements RandomVar {
         }
     }
     
-    public String test(){
-        int total = 0;
-        
-        for(int i = 0; i < 10000; i++){
-            total += nextDraw();
-        }
-        
-        return ""+(total/10000.0)+" "+lambda;
-    }
     
-    public int nextDraw() {
-        double p = Params.rand.nextDouble();
+    public int nextDraw(Network network) {
+        double p = network.rand.nextDouble();
         
         for(int i = 0; i < cdf.length; i++){
             if(cdf[i] > p){

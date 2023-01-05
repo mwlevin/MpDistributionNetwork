@@ -27,13 +27,13 @@ public class Node extends Location{
     
     private int capacity;
 
-    public Node(String name, double lat, double lng, int num_zones, int capacity){
+    public Node(String name, double lat, double lng, int num_zones, int capacity, Network network){
         super(name, lat, lng);
         
-        x = new int[Params.S][num_zones];
+        x = new int[network.params.S][num_zones];
         
-        if(Params.TRACK_PACKAGES){
-            x_track = new PriorityQueue[Params.S][num_zones];
+        if(network.params.TRACK_PACKAGES){
+            x_track = new PriorityQueue[network.params.S][num_zones];
 
             for(int s = 0; s < x_track.length; s++){
                 for(int d = 0; d < x_track[s].length; d++){
@@ -68,9 +68,9 @@ public class Node extends Location{
         return capacity;
     }
     
-    public void step() throws IloException {
-        if(Network.useMP){
-            stepMP();
+    public void step(Network network) throws IloException {
+        if(network.useMP){
+            stepMP(network);
         }
         else {
             stepSimple();
@@ -123,12 +123,12 @@ public class Node extends Location{
     }
     
     
-    public void stepMP() throws IloException {
+    public void stepMP(Network network) throws IloException {
         
         // solve MP problem
         
         IloCplex cplex = new IloCplex();
-        cplex.setOut(Params.out);
+        cplex.setOut(network.params.out);
         
         IloLinearNumExpr obj = cplex.linearNumExpr();
         
@@ -142,7 +142,7 @@ public class Node extends Location{
                             w -= ((Node)ij.getDest()).x[s][d];
                         }
                         
-                        double obj_weight = w + Params.node_beta * (getCost(d) - ij.getDest().getCost(d));
+                        double obj_weight = w + network.params.node_beta * (getCost(d) - ij.getDest().getCost(d));
                         
                         if(ij.getDest().isValidDest(d) && obj_weight > 0){
                             ij.mpvar_y[s][d] = cplex.intVar(0, x[s][d]);
@@ -196,16 +196,16 @@ public class Node extends Location{
         cplex.solve();
         
         for(Link ij : outgoing){
-            ij.setY(cplex);
+            ij.setY(cplex, network);
             
         }
         
         cplex.end();
     }
     
-    public void update(){
+    public void update(Network network){
         
-        if(Params.TRACK_PACKAGES){
+        if(network.params.TRACK_PACKAGES){
             for(Link ij : outgoing){
             
                 for(int s = 0; s < x.length; s++){
@@ -228,7 +228,7 @@ public class Node extends Location{
                     x[s][d] += added;
                     total_processed += added;
                     
-                    if(Params.TRACK_PACKAGES){
+                    if(network.params.TRACK_PACKAGES){
                         for(int a = 0; a < added; a++){
                             x_track[s][d].add(inc.y_track[inc.tt-1][s][d].get(a));
                         }
@@ -257,13 +257,13 @@ public class Node extends Location{
                         
 
                         int deliver = out.y[0][s][d];
-                        Network.total_delivered += deliver;
+                        network.total_delivered += deliver;
 
-                        if(Params.TRACK_PACKAGES){
+                        if(network.params.TRACK_PACKAGES){
                             for(int a = 0; a < deliver; a++){
                                 Shipment ship = out.y_track[0][s][d].get(a);
 
-                                int transport_time = Network.t - ship.fulfill_time+1;
+                                int transport_time = network.t - ship.fulfill_time+1;
 
                                 
                                 Network.transportTime.add(transport_time);
@@ -278,18 +278,18 @@ public class Node extends Location{
                     throw new RuntimeException("x[s][d]<0 "+x[s][d]);
                 }
                 
-                Network.total_packages += x[s][d];
+                network.total_packages += x[s][d];
                 
             }
         }
         
         for(Link l : incoming){
-            l.update();
+            l.update(network);
         }
         
         for(int s = 0; s < x.length; s++){
             for(int d = 0; d < x[s].length; d++){
-                if(Params.TRACK_PACKAGES && x[s][d] != x_track[s][d].size()){
+                if(network.params.TRACK_PACKAGES && x[s][d] != x_track[s][d].size()){
                     throw new RuntimeException("Size mismatch "+x[s][d]+" "+x_track[s][d].size()+" "+getClass().getName());
                 }
             }

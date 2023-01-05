@@ -26,22 +26,22 @@ public class Link {
     protected int tt;
 
     
-    public Link(Location start, Location dest, int num_zones){
+    public Link(Location start, Location dest, int num_zones, Network network){
         this.start = start;
         this.dest = dest;
-        this.dist = Params.haversine(start, dest);
+        this.dist = network.params.haversine(start, dest);
         
         
-        this.tt = (int)Math.max(1, Math.ceil(this.dist / Params.SPEED));
+        this.tt = (int)Math.max(1, Math.ceil(this.dist / network.params.SPEED));
         
         if(dest instanceof ZIP3){
             tt = 1;
         }
         
-        y = new int[tt][Params.S][num_zones];
+        y = new int[tt][network.params.S][num_zones];
         
-        if(Params.TRACK_PACKAGES){
-            y_track = new List[tt][Params.S][num_zones];
+        if(network.params.TRACK_PACKAGES){
+            y_track = new List[tt][network.params.S][num_zones];
 
             for(int t = 0; t < tt; t++){
                 for(int s = 0; s < y_track[t].length; s++){
@@ -53,7 +53,7 @@ public class Link {
         }
         
         
-        mpvar_y = new IloIntVar[Params.S][num_zones];
+        mpvar_y = new IloIntVar[network.params.S][num_zones];
         
         start.addOutgoing(this);
         dest.addIncoming(this);
@@ -64,7 +64,7 @@ public class Link {
         return new Location[]{start, dest};
     }
     
-    public void setY(IloCplex cplex) throws IloException{
+    public void setY(IloCplex cplex, Network network) throws IloException{
         
         
         for(int s = 0; s < y[0].length; s++){
@@ -76,7 +76,7 @@ public class Link {
                     y[0][s][d] = 0;
                 }
                 
-                if(Params.TRACK_PACKAGES){
+                if(network.params.TRACK_PACKAGES){
                     y_track[0][s][d] = new ArrayList<>();
                 }
             }
@@ -87,7 +87,7 @@ public class Link {
     
 
     
-    public void update(){
+    public void update(Network network){
         
         
         
@@ -95,7 +95,7 @@ public class Link {
         for(int tau = y.length-1; tau > 0; tau--){
             y[tau] = y[tau-1];
             
-            if(Params.TRACK_PACKAGES){
+            if(network.params.TRACK_PACKAGES){
                 y_track[tau] = y_track[tau-1];
             }
         }
@@ -112,8 +112,8 @@ public class Link {
         return dest;
     }
     
-    public double getCost(){
-        return dist / Params.SPEED;
+    public double getCost(Network network){
+        return dist / network.params.SPEED;
     }
     
 }

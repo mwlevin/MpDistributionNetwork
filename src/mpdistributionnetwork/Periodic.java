@@ -18,9 +18,9 @@ public class Periodic implements RandomVar {
         this.lambda = lambda;
     }
     
-    public int nextDraw(){
-        if(Network.t % Params.DAY == 0){
-            double temp = lambda*Params.DAY;
+    public int nextDraw(Network network){
+        if(network.t % network.params.DAY == 0){
+            double temp = lambda*network.params.DAY;
             int output = (int)Math.floor(temp);
             
             extra = temp - output;
