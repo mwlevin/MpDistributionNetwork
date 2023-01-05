@@ -21,7 +21,7 @@ public class Origin {
     private int[][] chi; // first index is product, 2nd index is destination
     private PriorityQueue<Shipment>[][] chi_track;
     
-    private Demand dem[][];
+    protected Demand dem[][];
 
     public Origin(FC[] fc, Demand dem[][]){
         int num_fc = fc.length;

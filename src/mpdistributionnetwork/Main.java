@@ -7,7 +7,9 @@ package mpdistributionnetwork;
 
 import ilog.concert.IloException;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import javax.swing.JFrame;
 
 /**
@@ -24,8 +26,16 @@ public class Main {
 
         Params.init();
         
-        Network test = new Network(true);
-        test.simulate(System.out);
+        boolean mp = false;
+        
+        for(int x = 10; x <= 40; x += 5){
+            Params.epsilon_cap = Params.epsilon_inv = x/100.0;
+            PrintStream out = new PrintStream(new FileOutputStream("log_"+Params.epsilon_cap+"_beta"+Params.beta+"_"+mp+".txt"), true);
+            Network test = new Network(mp);
+            test.simulate(out);
+
+            test = null;
+        }
         
         /*
         MapViewer map = new MapViewer(test, 1000, 1600);
@@ -38,8 +48,7 @@ public class Main {
         
 
         
-        test = new Network(false);
-        test.simulate(System.out);    
+
     }
     
 }

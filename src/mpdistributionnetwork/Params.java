@@ -26,14 +26,15 @@ public class Params {
     
     public static final double SPEED = 60.0 * 24.0/DAY;
     
-    public static final double beta = 0.05;
+    public static double beta = 0.05;
+    public static double node_beta = 0.05;
     
     public static final int FC_CAPACITY = (int)Math.round(100 * 24.0/DAY);
-    public static final int SC_CAPACITY = (int)Math.round(1000 * 24.0/DAY);
+    public static final int SC_CAPACITY = (int)Math.round(400 * 24.0/DAY);
     public static final int DS_CAPACITY = (int)Math.round(1000 * 24.0/DAY);
     
-    public static final double epsilon_inv = 0.1; // extra inventory deliveries
-    public static final double epsilon_cap = 0.1; // extra inventory deliveries
+    public static double epsilon_inv = 0.1; // extra inventory deliveries
+    public static double epsilon_cap = 0.1; // extra inventory deliveries
     
     
     

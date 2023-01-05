@@ -30,10 +30,7 @@ public class Network {
     private List<Node> all_nodes;
     
     private Origin origin;
-    
-    private Demand[][] dem;
-    private Restock[][] restock;
-    
+
     
     public Network(boolean mp) throws IOException {
         
@@ -300,6 +297,28 @@ public class Network {
     
     public void simulate(PrintStream out) throws IloException {
         
+        double total_lambda = 0;
+        for(int d = 0; d < dests.length; d++){
+            for(int p = 0; p < Params.P; p++){
+                total_lambda += origin.dem[p][d].getAvg();
+            }
+        }
+
+        double total_inv = 0;
+        for(int f = 0; f < fcs.length; f++){
+            for(int p = 0; p < Params.P; p++){
+                total_inv += fcs[f].getRestock()[p].getAvg();
+            }
+            
+        }
+        
+        out.println("Total demand\t"+total_lambda);
+        out.println("Total restock\t"+total_inv);
+        out.println("MP\t"+useMP);
+        out.println("FC capacity\t"+Params.FC_CAPACITY);
+        out.println("SC capacity\t"+Params.SC_CAPACITY);
+        out.println("DS capacity\t"+Params.DS_CAPACITY);
+
         originTime = new RunningAvg();
         nodeTime = new RunningAvg();
         simTime = new RunningAvg();
@@ -307,6 +326,18 @@ public class Network {
         transportTime = new RunningAvg();
         
         out.println("Time\tOrders\tDemand\tInventory\tRestock\tTotal packages\tNew packages\tDelivered");
+        
+        /*
+        for(int t = 0; t < 12; t++){
+            for(FC f : fcs){
+                f.restock();
+            }
+        }
+        
+        for(FC f : fcs){
+            System.out.println(f.getName()+": "+f.getInventory());
+        }
+        */
         
         for(t = 0; t < Params.T; t++){
             
@@ -335,6 +366,17 @@ public class Network {
         out.println("Total delivered\t"+sim_delivered);
         out.println("Fulfillment time\t"+fulfillTime.getAverage());
         out.println("Transport time\t"+transportTime.getAverage());
+        
+        
+        out.println("\t");
+        
+        /*
+        for(Node n : all_nodes){
+            if(n instanceof SC){
+                out.println("SC "+n.getName()+"\t"+((double)((SC) n).total_processed / Params.T));
+            }
+        }
+        */
     }
     
     public List<Node> getNodes(){

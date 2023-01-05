@@ -23,6 +23,8 @@ public class Node extends Location{
     protected PriorityQueue<Shipment>[][] x_track;
     protected double[] cost; // cost to go for destination
     
+    protected int total_processed;
+    
     private int capacity;
 
     public Node(String name, double lat, double lng, int num_zones, int capacity){
@@ -140,7 +142,7 @@ public class Node extends Location{
                             w -= ((Node)ij.getDest()).x[s][d];
                         }
                         
-                        double obj_weight = w + Params.beta * (getCost(d) - ij.getDest().getCost(d));
+                        double obj_weight = w + Params.node_beta * (getCost(d) - ij.getDest().getCost(d));
                         
                         if(ij.getDest().isValidDest(d) && obj_weight > 0){
                             ij.mpvar_y[s][d] = cplex.intVar(0, x[s][d]);
@@ -224,6 +226,7 @@ public class Node extends Location{
                     int added = inc.y[inc.tt-1][s][d];
                     
                     x[s][d] += added;
+                    total_processed += added;
                     
                     if(Params.TRACK_PACKAGES){
                         for(int a = 0; a < added; a++){
@@ -260,9 +263,9 @@ public class Node extends Location{
                             for(int a = 0; a < deliver; a++){
                                 Shipment ship = out.y_track[0][s][d].get(a);
 
-                                int transport_time = Network.t - ship.fulfill_time;
+                                int transport_time = Network.t - ship.fulfill_time+1;
 
-                                Network.fulfillTime.add(ship.fulfill_time);
+                                
                                 Network.transportTime.add(transport_time);
                             }
                         }
@@ -286,7 +289,7 @@ public class Node extends Location{
         
         for(int s = 0; s < x.length; s++){
             for(int d = 0; d < x[s].length; d++){
-                if(x[s][d] != x_track[s][d].size()){
+                if(Params.TRACK_PACKAGES && x[s][d] != x_track[s][d].size()){
                     throw new RuntimeException("Size mismatch "+x[s][d]+" "+x_track[s][d].size()+" "+getClass().getName());
                 }
             }

@@ -33,6 +33,19 @@ public class FC extends Node {
     public void setRestock(Restock[] restock){
         this.restock = restock;
     }
+    public Restock[] getRestock(){
+        return restock;
+    }
+    
+    public int getInventory(){
+        int output = 0;
+        
+        for(int i : v){
+            output += i;
+        }
+        
+        return output;
+    }
     
     
     
@@ -59,6 +72,9 @@ public class FC extends Node {
                     for(int a = 0; a < new_packages; a++){
                         Shipment ship = arc.gamma_track[p][d].get(a);
                         ship.fulfill_time = Network.t;
+                        
+                        
+                        Network.fulfillTime.add(ship.fulfill_time - ship.create_time);
                         x_track[Params.SIZES[p]][d].add(ship);
                     }
                 }
@@ -71,6 +87,13 @@ public class FC extends Node {
             }
         }
         
+        restock();
+        
+        
+        super.update();
+    }
+    
+    public void restock(){
         for(int p = 0; p < v.length; p++){
             
             double res = Math.min(Params.inventory_max - v[p], restock[p].nextDraw());
@@ -79,7 +102,5 @@ public class FC extends Node {
             
             Network.total_inventory += v[p];
         }
-        
-        super.update();
     }
 }
