@@ -297,7 +297,7 @@ public class Network {
     public boolean useMP;
     
     private RunningAvg originTime, nodeTime, simTime;
-    public RunningAvg fulfill_time, transport_time, fulfill_test;
+    public RunningAvg fulfill_time, transport_time;
     private int sim_delivered;
     private int sim_packages;
     private int sim_orders;
@@ -333,15 +333,15 @@ public class Network {
         transport_time = new RunningAvg();
         
         
-        out.println("Time\tOrders\tDemand\tInventory\tRestock\tTotal packages\tNew packages\tDelivered\tAvg fulfillment time\tAvg. transport time");
+        out.println("Time\tOrders\tDemand\tInventory\tRestock\tTotal packages\tNew packages\tDelivered");
         
-        
+        /*
         for(int t = 0; t < 1; t++){
             for(FC f : fcs){
                 f.restock(this);
             }
         }
-        
+        */
 
         
         
@@ -354,18 +354,31 @@ public class Network {
             new_orders = 0;
             new_packages = 0;
             
-            fulfill_test = new RunningAvg();
+
             
             step();
             update();
-            out.println(t+"\t"+origin.getNumOrders()+"\t"+new_orders+"\t"+total_inventory+"\t"+new_inventory+"\t"+total_packages+"\t"+new_packages+"\t"+total_delivered+"\t"+
-                    fulfill_time.getAverage()+"\t"+transport_time.getAverage());
+            out.println(t+"\t"+origin.getNumOrders()+"\t"+new_orders+"\t"+total_inventory+"\t"+new_inventory+"\t"+total_packages+"\t"+new_packages+"\t"+total_delivered);
             
             sim_orders += new_orders;
             sim_delivered += total_delivered;
             sim_packages += new_packages;
             
             
+        }
+        
+        if(params.TRACK_PACKAGES){
+            RunningAvg ship_delay = new RunningAvg();
+            RunningAvg fulfill_delay = new RunningAvg();
+
+            for(Node n : all_nodes){
+                n.addShipDelay(this, ship_delay);
+            }
+
+            origin.addFulfillDelay(this, fulfill_delay);
+            
+            out.println("Shipment delay\t"+ship_delay.getAverage());
+            out.println("Fulfill delay\t"+fulfill_delay.getAverage());
         }
         
         out.println("Origin CPU time\t"+originTime.getAverage());

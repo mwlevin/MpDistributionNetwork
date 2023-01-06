@@ -288,6 +288,16 @@ public class Origin {
         }
     }
     
+    public void addFulfillDelay(Network network, RunningAvg avg){
+        for(int p = 0; p < chi.length; p++){
+            for(int d = 0; d < chi[p].length; d++){
+                for(Shipment ship : chi_track[p][d]){
+                    avg.add(network.t - ship.create_time);
+                }
+            }
+        }
+    }
+    
     public int getNumOrders(){
         int output = 0;
 

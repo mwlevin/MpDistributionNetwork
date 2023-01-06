@@ -82,7 +82,7 @@ public class FC extends Node {
                         
                         
                         network.fulfill_time.add(ship.fulfill_time - ship.create_time);
-                        network.fulfill_test.add(ship.fulfill_time - ship.create_time);
+   
                         
                         //System.out.println(ship.fulfill_time+"\t"+ship.create_time+"\t"+(ship.fulfill_time - ship.create_time)+"\t"+network.fulfill_time.getAverage());
 

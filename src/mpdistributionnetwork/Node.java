@@ -208,6 +208,16 @@ public class Node extends Location{
         cplex.end();
     }
     
+    public void addShipDelay(Network network, RunningAvg avg){
+        for(int s = 0; s < x.length; s++){
+            for(int d = 0; d < x[s].length; d++){
+                for(Shipment ship : x_track[s][d]){
+                    avg.add(network.t - ship.fulfill_time);
+                }
+            }
+        }
+    }
+    
     public void update(Network network){
         
         if(network.params.TRACK_PACKAGES){
