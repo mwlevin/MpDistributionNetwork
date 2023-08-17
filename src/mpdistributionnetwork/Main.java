@@ -46,8 +46,27 @@ public class Main {
         
         boolean mp = true;
         
+        /*
+        for(int x = 1; x <= 10; x += 2){
+            if(x == 5){
+                continue;
+            }
+            Params params = new Params();
+            params.node_beta = x / 100.0;
+            params.epsilon_cap = params.epsilon_inv = 0.1;
+            
+            PrintStream out = new PrintStream(new FileOutputStream("log_"+params.epsilon_cap+"_betanode"+params.node_beta+"_"+mp+".txt"), true);
+            Network test = new Network(mp, params);
+            test.simulate(out);
+
+            test = null;
+            
+            System.gc();
+        }
+        */
+        
         // 0.005, 0.01, 0.05, 0.1, 
-        for(int x = 1; x <= 10; x += 1){
+        for(int x = 3; x <= 10; x += 2){
             if(x == 5){
                 continue;
             }
@@ -63,6 +82,9 @@ public class Main {
             
             System.gc();
         }
+        
+        
+        
         
         
         /*
