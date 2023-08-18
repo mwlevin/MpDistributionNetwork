@@ -47,6 +47,14 @@ public abstract class Location implements Comparable<Location> {
         outgoing.add(l);
     }
     
+    public double getEstimatedQueueDelay(){
+        return 0;
+    }
+    
+    public int getTotalX(){
+        return 0;
+    }
+    
     public abstract void step(Network network) throws IloException ;
     public abstract void update(Network network);
     public abstract void setCost(ZIP3 d, double cost);

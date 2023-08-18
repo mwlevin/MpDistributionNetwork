@@ -416,6 +416,12 @@ public class Network {
         
         long time2 = System.nanoTime();
         long time = time2;
+        
+        if(!useMP){
+            calcCosts();
+        }
+        
+        
         origin.step(this);
         
         originTime.add( (System.nanoTime() - time)/1.0e9);

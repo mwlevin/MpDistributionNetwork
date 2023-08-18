@@ -47,6 +47,21 @@ public class Node extends Location{
         this.capacity = capacity;
     }
  
+    public int getTotalX(){
+        int output = 0;
+        
+        for(int s = 0; s < x.length; s++){
+            for(int d = 0; d < x[s].length; d++){
+                output += x[s][d];
+            }
+        }
+        
+        return output;
+    }
+    
+    public double getEstimatedQueueDelay(){
+        return Math.floor(getTotalX() / getCapacity());
+    }
     
     public boolean isValidDest(int d){
         return true;

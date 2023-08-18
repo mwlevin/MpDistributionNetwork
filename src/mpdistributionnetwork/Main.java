@@ -44,7 +44,7 @@ public class Main {
 
         */
         
-        boolean mp = true;
+        boolean mp = false;
         
         /*
         for(int x = 1; x <= 10; x += 2){
@@ -74,7 +74,7 @@ public class Main {
             params.beta = x / 100.0;
             params.epsilon_cap = params.epsilon_inv = 0.1;
             
-            PrintStream out = new PrintStream(new FileOutputStream("log_"+params.epsilon_cap+"_beta"+params.beta+"_"+mp+".txt"), true);
+            PrintStream out = new PrintStream(new FileOutputStream("log_"+params.epsilon_cap+"_beta"+params.beta+"_"+mp+"_rev.txt"), true);
             Network test = new Network(mp, params);
             test.simulate(out);
 
