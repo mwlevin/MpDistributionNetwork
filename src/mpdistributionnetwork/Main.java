@@ -28,6 +28,24 @@ public class Main {
 
         boolean mp = false;
         
+        mp = true;
+        
+        for(int x = 10; x <= 35; x += 5){
+            Params params = new Params();
+            params.epsilon_cap = params.epsilon_inv = x/100.0;
+            
+            PrintStream out = new PrintStream(new FileOutputStream("log_"+params.epsilon_cap+"_beta"+params.beta+"_"+mp+"_rev.txt"), true);
+            Network test = new Network(mp, params);
+            test.simulate(out);
+
+            test = null;
+            
+            System.gc();
+        }
+        
+        mp = false;
+        
+        
         for(int x = 10; x <= 35; x += 5){
             Params params = new Params();
             params.greedy2 = true;
@@ -55,21 +73,9 @@ public class Main {
             
             System.gc();
         }
+       
         
-        mp = true;
         
-        for(int x = 10; x <= 35; x += 5){
-            Params params = new Params();
-            params.epsilon_cap = params.epsilon_inv = x/100.0;
-            
-            PrintStream out = new PrintStream(new FileOutputStream("log_"+params.epsilon_cap+"_beta"+params.beta+"_"+mp+"_rev.txt"), true);
-            Network test = new Network(mp, params);
-            test.simulate(out);
-
-            test = null;
-            
-            System.gc();
-        }
         
 
         /*
