@@ -28,7 +28,7 @@ public class Main {
 
         boolean mp = false;
         
-        for(int x = 5; x >= 5; x -= 5){
+        for(int x = 10; x <= 35; x += 5){
             Params params = new Params();
             params.greedy2 = true;
             params.epsilon_cap = params.epsilon_inv = x/100.0;
@@ -42,7 +42,7 @@ public class Main {
             System.gc();
         }
         
-        for(int x = 5; x >= 5; x -= 5){
+        for(int x = 10; x <= 35; x += 5){
             Params params = new Params();
             
             params.epsilon_cap = params.epsilon_inv = x/100.0;
@@ -58,7 +58,7 @@ public class Main {
         
         mp = true;
         
-        for(int x = 5; x >= 5; x -= 5){
+        for(int x = 10; x <= 35; x += 5){
             Params params = new Params();
             params.epsilon_cap = params.epsilon_inv = x/100.0;
             

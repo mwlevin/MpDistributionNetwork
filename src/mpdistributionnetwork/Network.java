@@ -181,6 +181,7 @@ public class Network {
                 dem[p][d] = new Demand(prob[p][d] / total_p[p] * total[p]);
                 total_lambda += dem[p][d].getAvg();
             }
+
         }
         
 
@@ -286,6 +287,19 @@ public class Network {
             }
         }
         
+        
+
+        for(int d = 0; d < dests.length; d++){
+            double total_lambda_d = 0;
+            
+            for(int p = 0; p < params.P; p++){
+                total_lambda_d += dem[p][d].getAvg();
+            }
+            
+            if(dests[d].getTotalIncCapacity() < total_lambda_d){
+                System.out.println("Capacity for "+dests[d]+" is "+dests[d].getTotalIncCapacity()+" but demand is "+total_lambda_d);
+            }
+        }
 
         
         origin = new Origin(fcs, dem, this);

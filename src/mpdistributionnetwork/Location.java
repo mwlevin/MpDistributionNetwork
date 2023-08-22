@@ -33,6 +33,20 @@ public abstract class Location implements Comparable<Location> {
         outgoing = new ArrayList<>();
     }
     
+    public int getCapacity(){
+        return 0;
+    }
+    
+    public double getTotalIncCapacity(){
+        double output = 0;
+        
+        for(Link l : incoming){
+            output += l.getStart().getCapacity();
+        }
+        
+        return output;
+    }
+    
     public Coordinate getCoordinate()
     {
         return new Coordinate(lat, lng);

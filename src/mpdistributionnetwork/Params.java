@@ -30,8 +30,8 @@ public class Params {
     public double node_beta = 0.05;
     
     public final int FC_CAPACITY = (int)Math.round(100 * 24.0/DAY);
-    public final int SC_CAPACITY = (int)Math.round(400 * 24.0/DAY);
-    public final int DS_CAPACITY = (int)Math.round(1000 * 24.0/DAY);
+    public final int SC_CAPACITY = (int)Math.round(200 * 24.0/DAY);
+    public final int DS_CAPACITY = (int)Math.round(200 * 24.0/DAY);
     
     public double epsilon_inv = 0.1; // extra inventory deliveries
     public double epsilon_cap = 0.1; // extra inventory deliveries
