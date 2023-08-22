@@ -37,6 +37,7 @@ public class Params {
     public double epsilon_cap = 0.1; // extra inventory deliveries
     
     
+    public static boolean greedy2 = false;
     
     
     public static final boolean PRINT_CPLEX = false;
@@ -48,6 +49,8 @@ public class Params {
     
     
     public final int inventory_max = 30;
+    
+    
     
     
     

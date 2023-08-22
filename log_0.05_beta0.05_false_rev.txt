@@ -1,0 +1,7 @@
+Total demand	5714.285714285696
+Total restock	5999.999999999994
+MP	false
+FC capacity	100
+SC capacity	400
+DS capacity	1000
+Time	Orders	Demand	Inventory	Restock	Total packages	New packages	Delivered

@@ -25,14 +25,44 @@ public class Main {
     public static void main(String[] args) throws IloException, Exception {
         // TODO code application logic here
 
-/*
-        boolean mp = true;
+
+        boolean mp = false;
         
-        for(int x = 35; x >= 10; x -= 5){
+        for(int x = 5; x >= 5; x -= 5){
+            Params params = new Params();
+            params.greedy2 = true;
+            params.epsilon_cap = params.epsilon_inv = x/100.0;
+            
+            PrintStream out = new PrintStream(new FileOutputStream("log_"+params.epsilon_cap+"_beta"+params.beta+"_"+mp+"_"+(params.greedy2?"rev":"")+".txt"), true);
+            Network test = new Network(mp, params);
+            test.simulate(out);
+
+            test = null;
+            
+            System.gc();
+        }
+        
+        for(int x = 5; x >= 5; x -= 5){
+            Params params = new Params();
+            
+            params.epsilon_cap = params.epsilon_inv = x/100.0;
+            
+            PrintStream out = new PrintStream(new FileOutputStream("log_"+params.epsilon_cap+"_beta"+params.beta+"_"+mp+"_"+(params.greedy2?"rev":"")+".txt"), true);
+            Network test = new Network(mp, params);
+            test.simulate(out);
+
+            test = null;
+            
+            System.gc();
+        }
+        
+        mp = true;
+        
+        for(int x = 5; x >= 5; x -= 5){
             Params params = new Params();
             params.epsilon_cap = params.epsilon_inv = x/100.0;
             
-            PrintStream out = new PrintStream(new FileOutputStream("log_"+params.epsilon_cap+"_beta"+params.beta+"_"+mp+".txt"), true);
+            PrintStream out = new PrintStream(new FileOutputStream("log_"+params.epsilon_cap+"_beta"+params.beta+"_"+mp+"_rev.txt"), true);
             Network test = new Network(mp, params);
             test.simulate(out);
 
@@ -42,10 +72,6 @@ public class Main {
         }
         
 
-        */
-        
-        boolean mp = false;
-        
         /*
         for(int x = 1; x <= 10; x += 2){
             if(x == 5){
@@ -66,6 +92,7 @@ public class Main {
         */
         
         // 0.005, 0.01, 0.05, 0.1, 
+        /*
         for(int x = 3; x <= 10; x += 2){
             if(x == 5){
                 continue;
@@ -83,7 +110,7 @@ public class Main {
             System.gc();
         }
         
-        
+        */
         
         
         

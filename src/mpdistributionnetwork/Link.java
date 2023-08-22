@@ -114,7 +114,12 @@ public class Link {
     }
     
     public double getCost(Network network){
-        return dist / network.params.SPEED + dest.getEstimatedQueueDelay();
+        if(network.params.greedy2){
+            return dist / network.params.SPEED + start.getEstimatedQueueDelay();
+        }
+        else{
+            return dist / network.params.SPEED;
+        }
     }
     
 }
