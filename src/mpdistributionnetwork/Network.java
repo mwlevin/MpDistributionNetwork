@@ -417,7 +417,7 @@ public class Network {
         long time2 = System.nanoTime();
         long time = time2;
         
-        if(!useMP){
+        if(!useMP && params.greedy2){
             calcCosts();
         }
         
