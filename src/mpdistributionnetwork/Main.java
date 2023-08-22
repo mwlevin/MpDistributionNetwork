@@ -33,7 +33,7 @@ public class Main {
             params.greedy2 = true;
             params.epsilon_cap = params.epsilon_inv = x/100.0;
             
-            PrintStream out = new PrintStream(new FileOutputStream("log_"+params.epsilon_cap+"_beta"+params.beta+"_"+mp+"_"+(params.greedy2?"rev":"")+".txt"), true);
+            PrintStream out = new PrintStream(new FileOutputStream("log_"+params.epsilon_cap+"_beta"+params.beta+"_"+mp+(params.greedy2?"_rev":"")+".txt"), true);
             Network test = new Network(mp, params);
             test.simulate(out);
 
@@ -47,7 +47,7 @@ public class Main {
             
             params.epsilon_cap = params.epsilon_inv = x/100.0;
             
-            PrintStream out = new PrintStream(new FileOutputStream("log_"+params.epsilon_cap+"_beta"+params.beta+"_"+mp+"_"+(params.greedy2?"rev":"")+".txt"), true);
+            PrintStream out = new PrintStream(new FileOutputStream("log_"+params.epsilon_cap+"_beta"+params.beta+"_"+mp+(params.greedy2?"_rev":"")+".txt"), true);
             Network test = new Network(mp, params);
             test.simulate(out);
 

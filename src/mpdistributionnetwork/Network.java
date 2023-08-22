@@ -359,6 +359,7 @@ public class Network {
             step();
             update();
             out.println(t+"\t"+origin.getNumOrders()+"\t"+new_orders+"\t"+total_inventory+"\t"+new_inventory+"\t"+total_packages+"\t"+new_packages+"\t"+total_delivered);
+            out.flush();
             
             sim_orders += new_orders;
             sim_delivered += total_delivered;
